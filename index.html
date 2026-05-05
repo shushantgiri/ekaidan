@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta property="og:title" content="Ekaidan - Learn English from Movies & Music">
+<meta property="og:description" content="Master real English using movie scenes and songs.">
+<meta property="og:image" content="https://imgs.search.brave.com/Rx2H4mDnxy3ZunKGQJCaCO_kKD9j202tP4jf_pyUfj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/Y3JlYXRlLnZpc3Rh/LmNvbS9kb3dubG9h/ZHMvZmFkMjRlOTMt/ODU4NS00NmRkLWJh/MTktZmExNDgxNDEz/OWY2XzQ1MC5qcGVn">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ekaidan - gamified English learning from movies and music">
+  <title>Ekaidan - Level up your real English</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Rubik:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0c10;--bg2:#13141a;--bg3:#1c1e27;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --txt:#f0f0f0;--txt2:#9a9aaa;--txt3:#555568;
+  --yellow:#f5c518;--green:#22d98a;--blue:#4fa3ff;
+  --purple:#a78bfa;--red:#ff5c5c;--orange:#ff8c3a;
+  --r:10px;--r2:16px;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}
+h1,h2,h3,.logo{font-family:'Rubik',sans-serif}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:0.5px solid var(--border);background:var(--bg)}
+.logo{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:var(--txt)}
+.logo span{color:var(--yellow)}
+.nav-r{display:flex;align-items:center;gap:16px}
+.xp-bar-mini{display:flex;align-items:center;gap:8px;background:var(--bg3);padding:6px 12px;border-radius:100px;border:0.5px solid var(--border2)}
+.xp-track{width:80px;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;width:62%;background:var(--yellow);border-radius:3px;transition:width 0.6s}
+.xp-label{font-size:12px;color:var(--yellow);font-weight:700}
+.level-badge{background:var(--yellow);color:#000;font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px}
+.nav-btn{background:var(--green);color:#000;font-size:13px;font-weight:700;padding:7px 18px;border-radius:100px;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+.hero{padding:56px 28px 40px;text-align:center;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--txt2);margin-bottom:20px}
+.pulse{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.5}}
+.hero h1{font-size:54px;font-weight:900;line-height:1.0;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .hl{color:var(--yellow)}
+.hero p{font-size:16px;color:var(--txt2);max-width:440px;margin:0 auto 28px;line-height:1.6}
+
+.modes-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.mode-btn{display:flex;align-items:center;gap:8px;background:var(--bg3);border:0.5px solid var(--border2);padding:10px 18px;border-radius:100px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;color:var(--txt)}
+.mode-btn:hover,.mode-btn.active{border-color:var(--yellow);color:var(--yellow)}
+.mode-icon{font-size:16px;width:16px;height:16px}
+
+.section{padding:0 28px 48px;max-width:860px;margin:0 auto}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:13px;font-weight:700;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase}
+.sec-link{font-size:12px;color:var(--blue);cursor:pointer}
+
+.scene-card-big{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s}
+.scene-card-big:hover{border-color:rgba(255,255,255,0.25)}
+.scene-screen{background:var(--bg3);height:160px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:0.5px solid var(--border)}
+.screen-inner{text-align:center}
+.movie-title{font-size:11px;color:var(--txt3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.play-circle{width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto}
+.play-tri{border-left:18px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.scene-tags{display:flex;gap:6px;position:absolute;top:10px;left:12px}
+.tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px}
+.tag.diff-easy{background:rgba(34,217,138,0.15);color:var(--green)}
+.tag.diff-med{background:rgba(245,197,24,0.15);color:var(--yellow)}
+.tag.diff-hard{background:rgba(255,92,92,0.15);color:var(--red)}
+.tag.genre{background:rgba(255,255,255,0.07);color:var(--txt2)}
+.xp-tag{position:absolute;top:10px;right:12px;background:rgba(245,197,24,0.2);color:var(--yellow);font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px}
+
+.scene-bottom{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.scene-info .title{font-size:14px;font-weight:700;margin-bottom:2px}
+.scene-info .sub{font-size:12px;color:var(--txt2)}
+.scene-meta{display:flex;gap:8px;align-items:center}
+.hearts{display:flex;gap:3px}
+.heart{width:10px;height:10px;background:var(--red);clip-path:polygon(50% 90%,10% 40%,30% 10%,50% 30%,70% 10%,90% 40%)}
+.combo-badge{background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px}
+
+.cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.mini-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color 0.2s,transform 0.15s}
+.mini-card:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-2px)}
+.mini-card .mc-icon{font-size:22px;width:22px;height:22px;margin-bottom:10px}
+.mini-card .mc-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.mini-card .mc-sub{font-size:11px;color:var(--txt2);line-height:1.4}
+.mini-card .mc-xp{font-size:11px;color:var(--yellow);font-weight:700;margin-top:8px}
+
+.challenge-section{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r2);padding:20px;margin-bottom:48px;margin-left:28px;margin-right:28px;max-width:860px;margin-left:auto;margin-right:auto}
+.ch-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ch-title{font-size:15px;font-weight:700}
+.ch-badge{background:rgba(167,139,250,0.2);color:var(--purple);font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px}
+.ch-question{font-size:20px;font-weight:700;text-align:center;margin:20px 0;color:var(--txt)}
+.ch-blanks{text-align:center;margin-bottom:20px}
+.blank{display:inline-block;border-bottom:2px solid var(--yellow);min-width:80px;text-align:center;color:var(--yellow);font-weight:700;font-size:18px;padding:0 4px;margin:0 4px}
+.ch-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ch-opt{background:var(--bg3);border:0.5px solid var(--border2);padding:11px 16px;border-radius:var(--r);font-size:14px;cursor:pointer;transition:all 0.15s;text-align:center;color:var(--txt)}
+.ch-opt:hover{border-color:var(--blue);color:var(--blue)}
+.ch-opt.correct{border-color:var(--green);background:rgba(34,217,138,0.1);color:var(--green)}
+.ch-opt.wrong{border-color:var(--red);background:rgba(255,92,92,0.1);color:var(--red)}
+.ch-timer{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2)}
+.timer-track{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.timer-fill{height:100%;background:var(--yellow);border-radius:2px;transition:width 0.1s linear}
+
+.leaderboard{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:48px;margin-left:auto;margin-right:auto;max-width:860px}
+.lb-head{padding:14px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.lb-title{font-size:14px;font-weight:700}
+.lb-sub{font-size:12px;color:var(--txt2)}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:0.5px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-row.me{background:rgba(245,197,24,0.05);border-color:rgba(245,197,24,0.15)}
+.lb-rank{font-size:13px;font-weight:700;color:var(--txt3);width:24px;text-align:center}
+.lb-rank.gold{color:var(--yellow)}
+.lb-rank.silver{color:#aaa}
+.lb-rank.bronze{color:var(--orange)}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.lb-name{flex:1;font-size:13px;font-weight:500}
+.lb-name .lb-you{font-size:10px;background:rgba(245,197,24,0.2);color:var(--yellow);padding:2px 6px;border-radius:100px;margin-left:6px;font-weight:700}
+.lb-score{font-size:13px;font-weight:700;color:var(--yellow)}
+.lb-streak{font-size:11px;color:var(--txt2);margin-left:8px}
+
+.daily-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 28px 48px;max-width:860px;margin:0 auto}
+.daily-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r2);padding:18px;position:relative;overflow:hidden}
+.dc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.dc-icon{font-size:22px;width:22px;height:22px}
+.dc-done{background:rgba(34,217,138,0.15);color:var(--green);font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.dc-pending{background:rgba(245,197,24,0.15);color:var(--yellow);font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.dc-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.dc-sub{font-size:12px;color:var(--txt2);margin-bottom:12px;line-height:1.5}
+.dc-xp{font-size:12px;color:var(--yellow);font-weight:700}
+.dc-progress{height:3px;background:var(--bg3);border-radius:2px;margin-top:10px;overflow:hidden}
+.dc-fill{height:100%;border-radius:2px;background:var(--green)}
+
+.streak-row{display:flex;gap:10px;padding:0 28px 48px;max-width:860px;margin:0 auto}
+.streak-big{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r2);padding:18px;flex:1;text-align:center}
+.streak-num{font-size:48px;font-weight:900;color:var(--yellow);line-height:1;font-family:'Rubik',sans-serif}
+.streak-sub{font-size:12px;color:var(--txt2);margin-top:4px}
+.flame-row{display:flex;justify-content:center;gap:4px;margin-top:10px}
+.flame{width:12px;height:14px;background:var(--orange);clip-path:polygon(50% 0%,100% 40%,80% 100%,20% 100%,0% 40%);opacity:0.3}
+.flame.lit{opacity:1}
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:2}
+.badge-item{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r);padding:10px;text-align:center}
+.badge-icon{font-size:20px;width:20px;height:20px;margin:0 auto 6px}
+.badge-name{font-size:10px;color:var(--txt2)}
+.badge-item.locked{opacity:0.35}
+
+.cta-band{background:var(--yellow);padding:36px 28px;text-align:center}
+.cta-band h2{font-family:'Rubik',sans-serif;font-size:32px;font-weight:900;color:#000;margin-bottom:8px;letter-spacing:-1px}
+.cta-band p{font-size:14px;color:rgba(0,0,0,0.6);margin-bottom:20px}
+.cta-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-dark{background:#000;color:#fff;border:none;padding:12px 28px;border-radius:100px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.cta-ghost{background:transparent;color:#000;border:2px solid rgba(0,0,0,0.2);padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+footer{border-top:0.5px solid var(--border);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--txt3)}
+  </style>
+</head>
+<body>
+  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Ekaidan gamified homepage — interactive English learning concept</h2>
+
+<nav>
+  <div class="logo">E<span>kaidan</span></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="xp-bar-mini">
+      <div class="xp-label">Lv 7</div>
+      <div class="xp-track"><div class="xp-fill" id="xpfill"></div></div>
+      <div style="font-size:11px;color:var(--txt2)" id="xpnum">620 / 1000 XP</div>
+    </div>
+    <div class="level-badge">★ Samurai</div>
+  </div>
+  <button class="nav-btn">Play now</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow"><div class="pulse"></div> 8,241 players online now</div>
+  <h1>Level up your<br><span class="hl">real English</span></h1>
+  <p>Learn from movies & music. Earn XP. Beat your friends. Actually have fun.</p>
+  <div class="modes-row">
+    <div class="mode-btn active" id="m1">🎬 <span>Movie Mode</span></div>
+    <div class="mode-btn" id="m2">🎵 <span>Music Mode</span></div>
+    <div class="mode-btn" id="m3">⚡ <span>Speed Round</span></div>
+    <div class="mode-btn" id="m4">🆚 <span>Battle</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-title">🔥 Hot right now</div>
+    <div class="sec-link">See all →</div>
+  </div>
+  <div class="scene-card-big" onclick="sendPrompt('Design the Ekaidan in-game scene player with XP rewards, combo multiplier, and pronunciation scoring')">
+    <div class="scene-screen">
+      <div class="screen-inner">
+        <div class="movie-title">Spider-Man: Homecoming</div>
+        <div class="play-circle"><div class="play-tri"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:8px">Tap to play scene</div>
+      </div>
+      <div class="scene-tags">
+        <span class="tag diff-med">Intermediate</span>
+        <span class="tag genre">Slang</span>
+      </div>
+      <div class="xp-tag">+120 XP</div>
+    </div>
+    <div class="scene-bottom">
+      <div class="scene-info">
+        <div class="title">Spider-Man: Homecoming</div>
+        <div class="sub">6 lines · "You've got to be kidding me" · Confrontation scene</div>
+      </div>
+      <div class="scene-meta">
+        <div class="hearts"><div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart" style="background:var(--txt3)"></div><div class="heart" style="background:var(--txt3)"></div></div>
+        <div class="combo-badge">x3 COMBO</div>
+      </div>
+    </div>
+  </div>
+  <div class="cards-3">
+    <div class="mini-card">
+      <div class="mc-icon">👠</div>
+      <div class="mc-title">Devil Wears Prada</div>
+      <div class="mc-sub">Office sarcasm · 8 lines</div>
+      <div class="mc-xp">+95 XP</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">🎓</div>
+      <div class="mc-title">Good Will Hunting</div>
+      <div class="mc-sub">Deep emotion · 5 lines</div>
+      <div class="mc-xp">+80 XP</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">🌀</div>
+      <div class="mc-title">Inception</div>
+      <div class="mc-sub">Mind-bending · 7 lines</div>
+      <div class="mc-xp">+140 XP</div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
+  <div class="sec-head">
+    <div class="sec-title">⚡ Daily challenge</div>
+    <div class="ch-timer">
+      <span>Resets in 4h 22m</span>
+      <div class="timer-track"><div class="timer-fill" id="tfill" style="width:82%"></div></div>
+    </div>
+  </div>
+</div>
+<div class="challenge-section">
+  <div class="ch-head">
+    <div class="ch-title">Fill in the blank</div>
+    <div class="ch-badge">+200 XP bonus</div>
+  </div>
+  <div style="font-size:12px;color:var(--txt2);margin-bottom:4px;text-align:center">Shape of You — Ed Sheeran</div>
+  <div class="ch-question">
+    "The <div class="blank" id="blank1">_____</div> of your body in the sound"
+  </div>
+  <div style="font-size:12px;color:var(--txt2);text-align:center;margin-bottom:16px">意味: あなたの体の形が音の中に</div>
+  <div class="ch-options">
+    <div class="ch-opt" onclick="answer(this,'wrong')">movement</div>
+    <div class="ch-opt" onclick="answer(this,'correct')">shape</div>
+    <div class="ch-opt" onclick="answer(this,'wrong')">rhythm</div>
+    <div class="ch-opt" onclick="answer(this,'wrong')">sound</div>
+  </div>
+  <div style="font-size:11px;color:var(--txt3);text-align:center;margin-top:12px" id="hint">選んでください — Choose your answer</div>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:0 28px 16px">
+  <div class="sec-head">
+    <div class="sec-title">🏆 Weekly leaderboard</div>
+    <div class="sec-link">Your league →</div>
+  </div>
+</div>
+<div class="leaderboard" style="margin-left:28px;margin-right:28px">
+  <div class="lb-head">
+    <div class="lb-title">Samurai League</div>
+    <div class="lb-sub">Top 3 promote to Master League</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank gold">1</div>
+    <div class="lb-avatar" style="background:#f5c51822;color:var(--yellow)">YK</div>
+    <div class="lb-name">Yuki_Kaze</div>
+    <div class="lb-score">4,280 XP</div>
+    <div class="lb-streak" style="color:var(--orange)">🔥 21</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank silver">2</div>
+    <div class="lb-avatar" style="background:#aaa2;color:#aaa">HN</div>
+    <div class="lb-name">hana_nihongo</div>
+    <div class="lb-score">3,910 XP</div>
+    <div class="lb-streak">🔥 14</div>
+  </div>
+  <div class="lb-row me">
+    <div class="lb-rank" style="color:var(--yellow)">3</div>
+    <div class="lb-avatar" style="background:rgba(79,163,255,0.15);color:var(--blue)">ME</div>
+    <div class="lb-name">You <span class="lb-you">★ me</span></div>
+    <div class="lb-score">3,640 XP</div>
+    <div class="lb-streak" style="color:var(--green)">🔥 14</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank">4</div>
+    <div class="lb-avatar" style="background:#2222;color:var(--txt3)">TM</div>
+    <div class="lb-name">tomo_eigo</div>
+    <div class="lb-score">3,580 XP</div>
+    <div class="lb-streak">🔥 9</div>
+  </div>
+  <div class="lb-row">
+    <div class="lb-rank">5</div>
+    <div class="lb-avatar" style="background:#2222;color:var(--txt3)">RS</div>
+    <div class="lb-name">risa_speaks</div>
+    <div class="lb-score">3,100 XP</div>
+    <div class="lb-streak">🔥 5</div>
+  </div>
+</div>
+
+<div style="max-width:860px;margin:24px auto 0;padding:0 28px">
+  <div class="sec-head">
+    <div class="sec-title">📅 Today's quests</div>
+    <div style="font-size:12px;color:var(--txt2)">3 / 4 done</div>
+  </div>
+</div>
+<div class="daily-row">
+  <div class="daily-card">
+    <div class="dc-top"><div class="dc-icon">🎬</div><div class="dc-done">Done ✓</div></div>
+    <div class="dc-title">Watch 1 scene</div>
+    <div class="dc-sub">Spider-Man completed</div>
+    <div class="dc-xp">+80 XP earned</div>
+    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
+  </div>
+  <div class="daily-card">
+    <div class="dc-top"><div class="dc-icon">🎵</div><div class="dc-done">Done ✓</div></div>
+    <div class="dc-title">Finish a song</div>
+    <div class="dc-sub">Shape of You · karaoke mode</div>
+    <div class="dc-xp">+60 XP earned</div>
+    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
+  </div>
+  <div class="daily-card">
+    <div class="dc-top"><div class="dc-icon">🗣️</div><div class="dc-done">Done ✓</div></div>
+    <div class="dc-title">Shadow 3 lines</div>
+    <div class="dc-sub">Pronunciation: 88% accuracy</div>
+    <div class="dc-xp">+90 XP earned</div>
+    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
+  </div>
+  <div class="daily-card" style="border-color:rgba(245,197,24,0.3)">
+    <div class="dc-top"><div class="dc-icon">⚡</div><div class="dc-pending">2 left</div></div>
+    <div class="dc-title">Beat a friend</div>
+    <div class="dc-sub">Challenge 任意の友達 in Battle mode</div>
+    <div class="dc-xp">+150 XP waiting</div>
+    <div class="dc-progress"><div class="dc-fill" style="width:33%;background:var(--yellow)"></div></div>
+  </div>
+</div>
+
+<div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
+  <div class="sec-head"><div class="sec-title">🏅 Your badges</div><div class="sec-link">All 34 badges →</div></div>
+</div>
+<div class="streak-row">
+  <div class="streak-big">
+    <div class="streak-num" id="streaknum">14</div>
+    <div class="streak-sub">day streak</div>
+    <div class="flame-row">
+      <div class="flame lit"></div><div class="flame lit"></div><div class="flame lit"></div>
+      <div class="flame lit"></div><div class="flame lit"></div><div class="flame lit"></div>
+      <div class="flame lit"></div><div class="flame"></div><div class="flame"></div><div class="flame"></div>
+    </div>
+  </div>
+  <div class="badges-grid">
+    <div class="badge-item"><div class="badge-icon">🎬</div><div class="badge-name">Movie Fan</div></div>
+    <div class="badge-item"><div class="badge-icon">🎵</div><div class="badge-name">Lyricist</div></div>
+    <div class="badge-item"><div class="badge-icon">🔥</div><div class="badge-name">14-Day Streak</div></div>
+    <div class="badge-item"><div class="badge-icon">⚡</div><div class="badge-name">Speed Demon</div></div>
+    <div class="badge-item locked"><div class="badge-icon">👑</div><div class="badge-name">League King</div></div>
+    <div class="badge-item locked"><div class="badge-icon">🎤</div><div class="badge-name">Karaoke Pro</div></div>
+    <div class="badge-item locked"><div class="badge-icon">🌟</div><div class="badge-name">100 Scenes</div></div>
+    <div class="badge-item locked"><div class="badge-icon">🆚</div><div class="badge-name">Undefeated</div></div>
+  </div>
+</div>
+
+<div class="cta-band">
+  <h2>Ready to play?</h2>
+  <p>Join 8,000+ learners. Free to start. Actually addictive.</p>
+  <div class="cta-row">
+    <button class="cta-dark" onclick="sendPrompt('Design the Ekaidan battle mode where two players compete in real-time on the same movie scene')">Start playing →</button>
+    <button class="cta-ghost">Watch trailer</button>
+  </div>
+</div>
+
+<footer>
+  <div class="logo" style="font-size:15px">E<span>kaidan</span></div>
+  <div>English learning for Japanese players · 日本語サポート完備</div>
+  <div style="display:flex;gap:16px"><span style="cursor:pointer">Privacy</span><span style="cursor:pointer">Terms</span></div>
+</footer>
+
+<script>
+function sendPrompt(msg) {
+  console.log('Prompt:', msg);
+  // This function can be extended to handle API calls or other actions
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+function answer(el, result){
+  if(document.querySelector('.ch-opt.correct')||document.querySelector('.ch-opt.wrong')){return}
+  el.classList.add(result);
+  const hint=document.getElementById('hint');
+  const blank=document.getElementById('blank1');
+  const xpfill=document.getElementById('xpfill');
+  const xpnum=document.getElementById('xpnum');
+  if(result==='correct'){
+    blank.textContent='shape';
+    hint.textContent='✓ 正解！ "shape" = 形 · +200 XP!';
+    hint.style.color='var(--green)';
+    let cur=62;
+    const interval=setInterval(()=>{
+      cur=Math.min(cur+2,82);
+      xpfill.style.width=cur+'%';
+      xpnum.textContent=Math.round(cur*10)+' / 1000 XP';
+      if(cur>=82)clearInterval(interval);
+    },30);
+  } else {
+    hint.textContent='✗ 不正解。 "shape" が正解 — "形"という意味。Try again!';
+    hint.style.color='var(--red)';
+    document.querySelectorAll('.ch-opt').forEach(o=>{
+      if(o.textContent.trim()==='shape')o.classList.add('correct');
+    });
+  }
+}
+
+let streak=14;
+setInterval(()=>{
+  const el=document.getElementById('streaknum');
+  el.style.transform='scale(1.08)';
+  setTimeout(()=>el.style.transform='scale(1)',300);
+},4000);
+
+let timerW=82;
+setInterval(()=>{
+  timerW=Math.max(timerW-0.02,0);
+  const tf=document.getElementById('tfill');
+  if(tf)tf.style.width=timerW.toFixed(1)+'%';
+},100);
+</script>
+</body>
+</html>
