@@ -22,16 +22,7 @@ if (!localStorage.getItem('scenes')) {
   ]);
 }
 
-// SONGS
-const DB = {
-  getScenes() {
-    return JSON.parse(localStorage.getItem('scenes')) || [];
-  },
-  saveScenes(data) {
-    localStorage.setItem('scenes', JSON.stringify(data));
-  }
-};
-
+// ===== SONGS =====
 const SongDB = {
   get() {
     return JSON.parse(localStorage.getItem('songs')) || [];
