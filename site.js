@@ -21,13 +21,3 @@ if (!localStorage.getItem('scenes')) {
     }
   ]);
 }
-
-// ===== SONGS =====
-const SongDB = {
-  get() {
-    return JSON.parse(localStorage.getItem('songs')) || [];
-  },
-  save(data) {
-    localStorage.setItem('songs', JSON.stringify(data));
-  }
-};

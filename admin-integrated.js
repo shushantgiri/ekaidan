@@ -144,18 +144,6 @@ function publishSong() {
 }
     
 
-  // 6. Create song object
-  const newSong = {
-    id: Date.now(),
-    title,
-    artist,
-    difficulty,
-    xp: Number(xp),
-    lyrics,
-    vocab,
-    youtubeId
-  };
-
   // 7. Save to localStorage
   songs.push(newSong);
   localStorage.setItem('songs', JSON.stringify(songs));
