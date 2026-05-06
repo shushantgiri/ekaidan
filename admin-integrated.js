@@ -140,3 +140,8 @@ function publishSong() {
   document.getElementById('song-vocab').value = "";
   document.getElementById('song-link').value = "";
 }
+
+const container = document.querySelector('.scenes-container');
+if (!container) return;
+
+container.innerHTML = ...
