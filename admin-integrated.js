@@ -144,16 +144,4 @@ function publishSong() {
 }
     
 
-  // 7. Save to localStorage
-  songs.push(newSong);
-  localStorage.setItem('songs', JSON.stringify(songs));
-
-  // 8. Confirmation
-  alert("Song added successfully 🎵");
-
-  // 9. Clear form
-  document.getElementById('song-title').value = "";
-  document.getElementById('song-artist').value = "";
-  document.getElementById('song-lyrics').value = "";
-  document.getElementById('song-vocab').value = "";
-  document.getElementById('song-link').value = "";
+  
