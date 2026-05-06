@@ -905,7 +905,111 @@ button,input[type=button],input[type=submit]{font-family:var(--font)}
       </div>
 
       <!-- ══════════ ADD CONTENT ══════════ -->
+      <h3><i class="ti ti-music"></i> Add Song</h3>
+
+      <h2>Add Song</h2>
+
+<label>Song title</label>
+<input id="song-title" placeholder="e.g. Let It Be">
+
+<label>Artist</label>
+<input id="song-artist" placeholder="e.g. The Beatles">
+
+<label>Difficulty</label>
+<select id="song-difficulty">
+  <option>Beginner</option>
+  <option>Intermediate</option>
+  <option>Advanced</option>
+</select>
+
+<label>XP Reward</label>
+<input id="song-xp" type="number" value="60">
+
+<label>Lyrics (one line per row)</label>
+<textarea id="song-lyrics" rows="5"></textarea>
+
+<label>Key vocab / slang</label>
+<textarea id="song-vocab"></textarea>
+
+<label>YouTube link</label>
+<input id="song-link" placeholder="https://...">
+
+<br><br>
+
+<button onclick="publishSong()">Publish</button>
+      
       <div id="pane-add" class="pane" style="display:none">
+
+  <div class="grid-2">
+
+    <!-- 🎬 SCENE CARD -->
+    <div class="card">
+      <h3>🎬 Add Movie Scene</h3>
+
+      <div class="form-group">
+        <label>Scene Title</label>
+        <input id="add-title" placeholder="e.g. You've got to be kidding me">
+      </div>
+
+      <div class="form-group">
+        <label>Movie</label>
+        <input id="add-movie" placeholder="Spider-Man">
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label>XP</label>
+          <input id="add-xp" type="number" placeholder="120">
+        </div>
+
+        <div>
+          <label>Level</label>
+          <select id="add-level">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="addSceneFromUI()">Add Scene</button>
+    </div>
+
+    <!-- 🎵 SONG CARD -->
+    <div class="card">
+      <h3>🎵 Add Song</h3>
+
+      <div class="form-group">
+        <label>Song Title</label>
+        <input id="song-title" placeholder="Shape of You">
+      </div>
+
+      <div class="form-group">
+        <label>Artist</label>
+        <input id="song-artist" placeholder="Ed Sheeran">
+      </div>
+
+      <div class="form-group">
+        <label>YouTube Video ID</label>
+        <input id="youtube-id" placeholder="JGwWNGJdvx8">
+      </div>
+
+      <div class="form-group">
+        <label>Lyric with blank</label>
+        <input id="lyric-line" placeholder="The _____ of your body in the sound">
+      </div>
+
+      <div class="form-group">
+        <label>Correct Answer</label>
+        <input id="correct-word" placeholder="shape">
+      </div>
+
+      <button class="btn-primary" onclick="addSongFromUI()">Add Song</button>
+    </div>
+
+  </div>
+
+</div>
         <div class="panels">
           <div class="panel">
             <div class="panel-head"><div class="panel-title"><i class="ti ti-movie"></i>Add Movie Scene</div></div>
@@ -1476,7 +1580,6 @@ document.getElementById('global-search').addEventListener('keydown',function(e){
 /* ── INIT ── */
 showPane('overview');
 </script>
-<script src="data.js"></script>
 <script src="admin-integrated.js"></script>
 </body>
 </html>
