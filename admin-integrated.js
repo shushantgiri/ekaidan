@@ -1,5 +1,8 @@
 function renderScenes() {
   const tbody = document.getElementById('scenes-tbody');
+
+ if (!tbody) return; // ✅ prevents crash
+
   const scenes = DB.getScenes();
 
   tbody.innerHTML = '';
