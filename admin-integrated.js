@@ -84,16 +84,7 @@ function showToast(msg) {
 
 function publishSong() {
 
-
-    let youtubeId = "";
-
-if (link.includes("youtube.com")) {
-  youtubeId = link.split("v=")[1]?.split("&")[0];
-} else if (link.includes("youtu.be")) {
-  youtubeId = link.split("/").pop().split("?")[0];
-}
-
-  // 1. Get existing songs (or empty array)
+  // 1. Get existing songs
   const songs = JSON.parse(localStorage.getItem('songs')) || [];
 
   // 2. Get values from form
@@ -105,7 +96,7 @@ if (link.includes("youtube.com")) {
   const vocab = document.getElementById('song-vocab').value;
   const link = document.getElementById('song-link').value;
 
-  // 3. Check required fields
+  // 3. Validation
   if (!title || !artist || !link) {
     alert("Please fill required fields");
     return;
@@ -114,14 +105,41 @@ if (link.includes("youtube.com")) {
   // 4. Convert lyrics into array
   const lyrics = lyricsRaw.split('\n').filter(line => line.trim() !== '');
 
-  // 5. Extract YouTube ID
+  // 5. Extract YouTube ID (ONLY ONE DECLARATION)
   let youtubeId = "";
 
   if (link.includes("youtube.com")) {
     youtubeId = link.split("v=")[1]?.split("&")[0];
   } else if (link.includes("youtu.be")) {
-    youtubeId = link.split("/").pop();
+    youtubeId = link.split("/").pop().split("?")[0];
   }
+
+  // 6. Create object
+  const newSong = {
+    id: Date.now(),
+    title,
+    artist,
+    difficulty,
+    xp: Number(xp),
+    lyrics,
+    vocab,
+    youtubeId
+  };
+
+  // 7. Save
+  songs.push(newSong);
+  localStorage.setItem('songs', JSON.stringify(songs));
+
+  alert("Song published 🎵");
+
+  // 8. Clear form
+  document.getElementById('song-title').value = "";
+  document.getElementById('song-artist').value = "";
+  document.getElementById('song-lyrics').value = "";
+  document.getElementById('song-vocab').value = "";
+  document.getElementById('song-link').value = "";
+}
+    
 
   // 6. Create song object
   const newSong = {
@@ -148,7 +166,3 @@ if (link.includes("youtube.com")) {
   document.getElementById('song-lyrics').value = "";
   document.getElementById('song-vocab').value = "";
   document.getElementById('song-link').value = "";
-
-
-
-}
