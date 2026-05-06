@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekaidan — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+/* ── RESET & ROOT ── */
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #0c0d10;
+  --bg2:       #111318;
+  --bg3:       #181b22;
+  --bg4:       #1e222c;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #e8eaf0;
+  --text2:     #8a8fa8;
+  --text3:     #4a5068;
+  --accent:    #7c6ef0;
+  --accent2:   #a594f9;
+  --accent-bg: rgba(124,110,240,0.12);
+  --accent-brd:rgba(124,110,240,0.3);
+  --green:     #3dd68c;
+  --green-bg:  rgba(61,214,140,0.1);
+  --green-brd: rgba(61,214,140,0.25);
+  --amber:     #f5a524;
+  --amber-bg:  rgba(245,165,36,0.1);
+  --amber-brd: rgba(245,165,36,0.25);
+  --red:       #f16a6a;
+  --red-bg:    rgba(241,106,106,0.1);
+  --red-brd:   rgba(241,106,106,0.25);
+  --blue:      #60b4f5;
+  --blue-bg:   rgba(96,180,245,0.1);
+  --blue-brd:  rgba(96,180,245,0.25);
+  --radius:    10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --sidebar-w: 220px;
+  --font:      'Syne', sans-serif;
+  --mono:      'DM Mono', monospace;
+}
+
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;display:flex}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+
+/* ── LAYOUT SHELL ── */
+.shell{display:grid;grid-template-columns:var(--sidebar-w) 1fr;width:100%;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0;
+  height:100vh;
+  overflow-y:auto;
+  position:relative;
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+}
+
+.sb-logo{
+  padding:22px 18px 20px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.sb-logo-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#fff;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(124,110,240,0.4);
+}
+.sb-logo-name{
+  font-size:16px;font-weight:800;letter-spacing:0.5px;
+  background:linear-gradient(90deg,var(--text),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sb-logo-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:-2px;letter-spacing:1px;-webkit-text-fill-color:var(--text3)}
+
+.sb-section{
+  padding:18px 16px 6px;
+  font-size:10px;color:var(--text3);
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:var(--mono);
+}
+
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 12px;border-radius:var(--radius-sm);
+  margin:1px 8px;cursor:pointer;
+  color:var(--text2);font-size:13px;font-weight:500;
+  transition:all 0.15s;
+  position:relative;
+}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:var(--accent-bg);color:var(--accent2);border:1px solid var(--accent-brd)}
+.sb-item.active::before{
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:16px;background:var(--accent);border-radius:2px;
+}
+.sb-item i{font-size:16px;flex-shrink:0}
+
+.sb-badge{
+  margin-left:auto;background:var(--red-bg);color:var(--red);
+  border:1px solid var(--red-brd);
+  font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;
+  font-family:var(--mono);
+}
+
+.sb-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border)}
+.sb-user{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius-sm);
+}
+.sb-user-av{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#a594f9);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:0.5px}
+.sb-item.logout{color:var(--red);font-size:13px;margin-top:4px}
+.sb-item.logout:hover{background:var(--red-bg)}
+
+/* ── MAIN ── */
+.main{display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.breadcrumb{font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.5px}
+.topbar-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+.search-wrap{
+  position:relative;display:flex;align-items:center;
+}
+.search-wrap i{position:absolute;left:10px;font-size:15px;color:var(--text3);pointer-events:none}
+.search-wrap input{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:7px 12px 7px 34px;font-size:13px;color:var(--text);
+  font-family:var(--font);width:200px;outline:none;
+  transition:border-color 0.2s,width 0.25s;
+}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-wrap input:focus{border-color:var(--accent-brd);width:240px;background:var(--bg4)}
+
+.topbar-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--radius-sm);
+  background:var(--accent-bg);border:1px solid var(--accent-brd);
+  color:var(--accent2);font-size:13px;font-weight:600;font-family:var(--font);
+  cursor:pointer;transition:all 0.15s;white-space:nowrap;
+}
+.topbar-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.topbar-btn i{font-size:15px}
+
+.notif-btn{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text2);font-size:18px;
+  position:relative;transition:all 0.15s;
+}
+.notif-btn:hover{border-color:var(--border2);color:var(--text)}
+.notif-dot{
+  position:absolute;top:7px;right:7px;
+  width:7px;height:7px;background:var(--red);
+  border-radius:50%;border:1.5px solid var(--bg2);
+}
+
+/* ── CONTENT AREA ── */
+.content{
+  flex:1;overflow-y:auto;
+  padding:24px;
+  display:flex;flex-direction:column;gap:20px;
+}
+
+/* ── PANE ANIMATIONS ── */
+.pane{animation:fadeSlide 0.25s ease forwards}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── METRICS GRID ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.metric{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+  transition:border-color 0.2s,transform 0.2s;
+  position:relative;overflow:hidden;
+}
+.metric::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.metric:hover{border-color:var(--border2);transform:translateY(-1px)}
+.metric:hover::after{opacity:1}
+.metric-label{font-size:11px;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px;font-family:var(--mono);letter-spacing:0.3px}
+.metric-label i{font-size:14px}
+.metric-value{font-size:26px;font-weight:800;letter-spacing:-0.5px}
+.metric-value.danger{color:var(--red)}
+.metric-delta{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px;font-family:var(--mono)}
+.delta-up{color:var(--green)}
+.delta-dn{color:var(--red)}
+
+/* ── PANELS ── */
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;
+}
+.panel-full{grid-column:1/-1}
+
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;letter-spacing:0.2px}
+.panel-title i{font-size:15px;color:var(--text2)}
+.panel-action{
+  font-size:12px;color:var(--accent2);cursor:pointer;
+  display:flex;align-items:center;gap:4px;font-family:var(--mono);
+  padding:5px 10px;border-radius:var(--radius-sm);
+  border:1px solid var(--accent-brd);background:var(--accent-bg);
+  transition:all 0.15s;font-weight:500;
+}
+.panel-action:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel-action i{font-size:13px}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+.content-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}
+.content-table th{
+  font-size:10px;color:var(--text3);font-weight:600;text-align:left;
+  padding:10px 18px;border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);
+}
+.content-table td{
+  padding:11px 18px;border-bottom:1px solid var(--border);
+  color:var(--text);vertical-align:middle;
+}
+.content-table tr:last-child td{border-bottom:none}
+.content-table tbody tr{transition:background 0.1s}
+.content-table tbody tr:hover td{background:var(--bg3)}
+.td-primary{font-weight:600}
+.td-secondary{color:var(--text2);font-family:var(--mono);font-size:12px}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.3px;font-family:var(--mono)}
+.pill-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
+.pill-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-brd)}
+.pill-red  {background:var(--red-bg)  ;color:var(--red)  ;border:1px solid var(--red-brd)}
+.pill-blue {background:var(--blue-bg) ;color:var(--blue) ;border:1px solid var(--blue-brd)}
+.pill-violet{background:var(--accent-bg);color:var(--accent2);border:1px solid var(--accent-brd)}
+.pill i{font-size:11px}
+
+/* ── ROW ACTIONS ── */
+.row-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{
+  background:none;border:1px solid transparent;cursor:pointer;
+  color:var(--text3);padding:5px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;font-size:15px;transition:all 0.15s;
+}
+.icon-btn:hover{background:var(--bg3);border-color:var(--border);color:var(--text)}
+.icon-btn.danger:hover{background:var(--red-bg);border-color:var(--red-brd);color:var(--red)}
+
+/* ── CHART BARS ── */
+.chart-area{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.chart-bar-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.chart-label{width:90px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;font-family:var(--mono);font-size:11px}
+.chart-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.chart-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.7s cubic-bezier(.4,0,.2,1)}
+.chart-fill.green{background:linear-gradient(90deg,#3dd68c,#57eaa6)}
+.chart-fill.amber{background:linear-gradient(90deg,#f5a524,#ffc54a)}
+.chart-val{font-size:11px;color:var(--text2);min-width:36px;text-align:right;flex-shrink:0;font-family:var(--mono)}
+
+/* ── FLAG LIST ── */
+.flag-list{display:flex;flex-direction:column}
+.flag-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  transition:background 0.1s;
+}
+.flag-item:last-child{border-bottom:none}
+.flag-item:hover{background:var(--bg3)}
+.flag-icon{
+  width:34px;height:34px;border-radius:var(--radius-sm);
+  background:var(--red-bg);border:1px solid var(--red-brd);
+  color:var(--red);display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;margin-top:1px;
+}
+.flag-body{flex:1;min-width:0}
+.flag-title{font-size:13px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flag-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.flag-btns{display:flex;gap:6px;flex-shrink:0;align-items:center}
+.flag-btn{
+  border:1px solid;font-size:11px;font-weight:700;font-family:var(--mono);
+  padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;
+  display:flex;align-items:center;gap:4px;transition:all 0.15s;
+  background:transparent;
+}
+.flag-fix{color:var(--green);border-color:var(--green-brd);background:var(--green-bg)}
+.flag-fix:hover{background:var(--green);color:#0c0d10;border-color:var(--green)}
+.flag-dismiss{color:var(--red);border-color:var(--red-brd);background:var(--red-bg)}
+.flag-dismiss:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* ── USERS ── */
+.user-list{display:flex;flex-direction:column}
+.user-row{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 18px;border-bottom:1px solid var(--border);
+  transition:background 0.1s;
+}
+.user-row:last-child{border-bottom:none}
+.user-row:hover{background:var(--bg3)}
+.user-av{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--accent-bg);border:1px solid var(--accent-brd);
+  color:var(--accent2);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--mono);
+}
+.user-av.alt{background:var(--bg3);border-color:var(--border);color:var(--text2)}
+.user-name{flex:1;font-size:13px;font-weight:600}
+.user-xp{font-size:12px;color:var(--text2);min-width:60px;text-align:right;font-family:var(--mono)}
+.xp-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:700;font-family:var(--mono);
+  padding:4px 10px;border-radius:var(--radius-sm);
+  background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-brd);
+  cursor:pointer;transition:all 0.15s;
+}
+.xp-btn:hover{background:var(--amber);color:#0c0d10}
+.xp-btn i{font-size:12px}
+
+/* ── FORMS ── */
+.add-form{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.form-row{display:flex;gap:12px}
+.form-group{display:flex;flex-direction:column;flex:1}
+.form-label{font-size:10px;color:var(--text3);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
+.form-group input,.form-group select,.form-group textarea{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:8px 11px;font-size:13px;color:var(--text);font-family:var(--font);
+  outline:none;transition:border-color 0.2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent-brd);background:var(--bg4)}
+.form-group textarea{resize:vertical;min-height:64px}
+.form-group select{appearance:none;cursor:pointer}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3)}
+.form-submit{display:flex;justify-content:flex-end;gap:8px;padding-top:4px}
+
+/* ── BUTTONS ── */
+button,input[type=button],input[type=submit]{font-family:var(--font)}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;
+  border:1px solid var(--border);background:var(--bg3);color:var(--text2);
+  font-family:var(--font);
+}
+.btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg4)}
+.btn i{font-size:14px}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:#6a5cd8;border-color:#6a5cd8;color:#fff}
+.btn-success{background:var(--green-bg);border-color:var(--green-brd);color:var(--green)}
+.btn-success:hover{background:var(--green);border-color:var(--green);color:#0c0d10}
+.btn-danger{background:var(--red-bg);border-color:var(--red-brd);color:var(--red)}
+.btn-danger:hover{background:var(--red);border-color:var(--red);color:#fff}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:8px}
+.filter-select{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:6px 10px;font-size:12px;color:var(--text2);font-family:var(--mono);
+  outline:none;cursor:pointer;
+}
+.filter-select:focus{border-color:var(--accent-brd)}
+
+/* ── TOAST BANNER ── */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--bg2);border:1px solid var(--green-brd);border-radius:var(--radius);
+  padding:12px 18px;display:none;align-items:center;gap:10px;
+  font-size:13px;color:var(--green);font-weight:600;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  animation:slideUp 0.3s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#toast i{font-size:18px}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+  z-index:100;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  width:440px;max-width:90vw;overflow:hidden;
+  animation:modalIn 0.2s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{
+  padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{
+  width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s;
+}
+.modal-close:hover{border-color:var(--border2);color:var(--text)}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:14px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── XP SETTINGS CARD ── */
+.xp-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ── ANALYTICS CARDS ── */
+.analytics-highlight{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-bottom:2px;
+}
+
+/* ── RETENTION TABLE ── */
+.retention-grid{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  gap:4px;padding:16px 18px;
+}
+.ret-cell{
+  aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  transition:transform 0.1s;cursor:default;
+}
+.ret-cell:hover{transform:scale(1.15)}
+.ret-hdr{background:transparent;color:var(--text3);font-size:10px}
+.ret-100{background:rgba(124,110,240,0.85);color:#fff}
+.ret-80 {background:rgba(124,110,240,0.65);color:#fff}
+.ret-60 {background:rgba(124,110,240,0.45);color:var(--text)}
+.ret-40 {background:rgba(124,110,240,0.28);color:var(--text2)}
+.ret-20 {background:rgba(124,110,240,0.14);color:var(--text3)}
+.ret-0  {background:var(--bg3);color:var(--text3)}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:40px;color:var(--text3);
+}
+.empty-state i{font-size:36px}
+.empty-state p{font-size:13px;font-family:var(--mono)}
+
+/* ── SEARCH HIGHLIGHT ── */
+.search-hl{background:rgba(124,110,240,0.25);border-radius:2px}
+
+/* ── STATUS INDICATOR ── */
+.status-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:5px;
+}
+.status-live .status-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-draft .status-dot{background:var(--amber)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .metrics,.analytics-highlight{grid-template-columns:1fr 1fr}
+  .panels{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"><i class="ti ti-circle-check"></i><span id="toast-msg">Saved successfully.</span></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Edit Content</div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveModal()"><i class="ti ti-device-floppy"></i> Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" aria-label="Ekaidan admin navigation">
+    <div class="sb-logo">
+      <div class="sb-logo-mark"><i class="ti ti-device-gamepad-2"></i></div>
+      <div>
+        <div class="sb-logo-name">Ekaidan</div>
+        <div class="sb-logo-sub">ADMIN PANEL</div>
+      </div>
+    </div>
+
+    <div class="sb-section">Overview</div>
+    <div class="sb-item active" data-pane="overview"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+
+    <div class="sb-section">Content</div>
+    <div class="sb-item" data-pane="scenes"><i class="ti ti-movie"></i>Movie Scenes</div>
+    <div class="sb-item" data-pane="songs"><i class="ti ti-music"></i>Songs</div>
+    <div class="sb-item" data-pane="add"><i class="ti ti-plus"></i>Add Content</div>
+
+    <div class="sb-section">Players</div>
+    <div class="sb-item" data-pane="users"><i class="ti ti-users"></i>Users &amp; XP</div>
+    <div class="sb-item" data-pane="flags"><i class="ti ti-flag"></i>Moderation <span class="sb-badge" id="flag-badge">5</span></div>
+
+    <div class="sb-section">Data</div>
+    <div class="sb-item" data-pane="analytics"><i class="ti ti-chart-bar"></i>Analytics</div>
+    <div class="sb-item" data-pane="settings"><i class="ti ti-settings"></i>Settings</div>
+
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-user-av">AD</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name">Admin</div>
+          <div class="sb-user-role">SUPERADMIN</div>
+        </div>
+      </div>
+      <div class="sb-item logout"><i class="ti ti-logout"></i>Sign out</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="breadcrumb">EKAIDAN / <span id="page-breadcrumb">OVERVIEW</span></div>
+          <div class="topbar-title" id="page-title">Dashboard</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="text" id="global-search" placeholder="Search content, users…" aria-label="Global search">
+        </div>
+        <div class="notif-btn" title="Notifications">
+          <i class="ti ti-bell"></i>
+          <div class="notif-dot"></div>
+        </div>
+        <button class="topbar-btn" onclick="showPane('add')"><i class="ti ti-plus"></i> New Content</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ══════════ DASHBOARD ══════════ -->
+      <div id="pane-overview" class="pane">
+        <div class="metrics" style="margin-bottom:0">
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-users"></i>Total Users</div>
+            <div class="metric-value">8,241</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +312 this week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-movie"></i>Scenes Published</div>
+            <div class="metric-value">142</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +8 this week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-music"></i>Songs Published</div>
+            <div class="metric-value">89</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +3 this week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-flag"></i>Pending Flags</div>
+            <div class="metric-value danger">5</div>
+            <div class="metric-delta delta-dn">Needs review</div>
+          </div>
+        </div>
+
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-chart-line"></i>Daily Active Players</div>
+              <div class="panel-action"><i class="ti ti-download"></i>Export</div>
+            </div>
+            <div class="chart-area">
+              <div class="chart-bar-row"><span class="chart-label">Mon</span><div class="chart-track"><div class="chart-fill" style="width:58%"></div></div><span class="chart-val">1,840</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Tue</span><div class="chart-track"><div class="chart-fill" style="width:72%"></div></div><span class="chart-val">2,290</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Wed</span><div class="chart-track"><div class="chart-fill" style="width:65%"></div></div><span class="chart-val">2,060</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Thu</span><div class="chart-track"><div class="chart-fill" style="width:80%"></div></div><span class="chart-val">2,540</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Fri</span><div class="chart-track"><div class="chart-fill" style="width:91%"></div></div><span class="chart-val">2,890</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Sat</span><div class="chart-track"><div class="chart-fill" style="width:100%"></div></div><span class="chart-val">3,170</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Sun</span><div class="chart-track"><div class="chart-fill" style="width:88%"></div></div><span class="chart-val">2,790</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-star"></i>Top Content This Week</div>
+              <div class="panel-action"><i class="ti ti-arrow-right"></i>See all</div>
+            </div>
+            <div class="chart-area">
+              <div class="chart-bar-row"><span class="chart-label">Spider-Man</span><div class="chart-track"><div class="chart-fill green" style="width:100%"></div></div><span class="chart-val">4.2k</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Shape of You</span><div class="chart-track"><div class="chart-fill green" style="width:83%"></div></div><span class="chart-val">3.5k</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Devil Wears P.</span><div class="chart-track"><div class="chart-fill green" style="width:71%"></div></div><span class="chart-val">2.9k</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Let It Be</span><div class="chart-track"><div class="chart-fill green" style="width:60%"></div></div><span class="chart-val">2.5k</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Inception</span><div class="chart-track"><div class="chart-fill green" style="width:48%"></div></div><span class="chart-val">2.0k</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-trophy"></i>Top Players</div>
+              <div class="panel-action" onclick="showPane('users')"><i class="ti ti-arrow-right"></i>Manage</div>
+            </div>
+            <div class="user-list">
+              <div class="user-row"><div class="user-av">YK</div><div class="user-name">Yuki_Kaze</div><span class="pill pill-amber" style="font-size:10px">Lv 12</span><div class="user-xp">4,280 XP</div></div>
+              <div class="user-row"><div class="user-av alt">HN</div><div class="user-name">hana_nihongo</div><span class="pill pill-amber" style="font-size:10px">Lv 11</span><div class="user-xp">3,910 XP</div></div>
+              <div class="user-row"><div class="user-av alt">TM</div><div class="user-name">tomo_eigo</div><span class="pill pill-blue" style="font-size:10px">Lv 10</span><div class="user-xp">3,580 XP</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-flag"></i>Recent Flags</div>
+              <div class="panel-action" onclick="showPane('flags')"><i class="ti ti-arrow-right"></i>Review</div>
+            </div>
+            <div class="flag-list">
+              <div class="flag-item">
+                <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+                <div class="flag-body">
+                  <div class="flag-title">Wrong translation — Shape of You, line 3</div>
+                  <div class="flag-meta">hana_nihongo · 2 hours ago</div>
+                </div>
+              </div>
+              <div class="flag-item">
+                <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+                <div class="flag-body">
+                  <div class="flag-title">Audio sync issue — Spider-Man scene, line 4</div>
+                  <div class="flag-meta">tomo_eigo · 5 hours ago</div>
+                </div>
+              </div>
+              <div class="flag-item">
+                <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+                <div class="flag-body">
+                  <div class="flag-title">Pronunciation guide missing — Let It Be, line 7</div>
+                  <div class="flag-meta">akira_kun · 1 day ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ SCENES ══════════ -->
+      <div id="pane-scenes" class="pane" style="display:none">
+        <div class="panel panel-full">
+          <div class="panel-head">
+            <div class="panel-title"><i class="ti ti-movie"></i>Movie Scenes</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="filter-bar">
+                <select class="filter-select" id="scene-filter" onchange="filterScenes()">
+                  <option value="">All levels</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+                <select class="filter-select" id="scene-status" onchange="filterScenes()">
+                  <option value="">All status</option>
+                  <option value="Live">Live</option>
+                  <option value="Draft">Draft</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="showPane('add')"><i class="ti ti-plus"></i> Add Scene</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="content-table" id="scenes-table" aria-label="Movie scenes list">
+              <thead><tr>
+                <th style="width:28%">Scene</th>
+                <th style="width:15%">Movie</th>
+                <th style="width:8%">Lines</th>
+                <th style="width:13%">Difficulty</th>
+                <th style="width:8%">XP</th>
+                <th style="width:13%">Status</th>
+                <th style="width:15%">Actions</th>
+              </tr></thead>
+              <tbody id="scenes-tbody">
+                <tr data-level="Intermediate" data-status="Live">
+                  <td class="td-primary">"You've got to be kidding me"</td>
+                  <td class="td-secondary">Spider-Man</td>
+                  <td>6</td>
+                  <td><span class="pill pill-amber">Intermediate</span></td>
+                  <td>120</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('scene','You\'ve got to be kidding me','Spider-Man',120,'Intermediate','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Advanced" data-status="Live">
+                  <td class="td-primary">"That's all"</td>
+                  <td class="td-secondary">Devil Wears Prada</td>
+                  <td>8</td>
+                  <td><span class="pill pill-red">Advanced</span></td>
+                  <td>95</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('scene','That\'s all','Devil Wears Prada',95,'Advanced','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Beginner" data-status="Draft">
+                  <td class="td-primary">"It's not your fault"</td>
+                  <td class="td-secondary">Good Will Hunting</td>
+                  <td>5</td>
+                  <td><span class="pill pill-blue">Beginner</span></td>
+                  <td>80</td>
+                  <td><span class="pill pill-amber"><i class="ti ti-clock"></i>Draft</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('scene','It\'s not your fault','Good Will Hunting',80,'Beginner','Draft')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Advanced" data-status="Live">
+                  <td class="td-primary">"You're dreaming"</td>
+                  <td class="td-secondary">Inception</td>
+                  <td>7</td>
+                  <td><span class="pill pill-red">Advanced</span></td>
+                  <td>140</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('scene','You\'re dreaming','Inception',140,'Advanced','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Beginner" data-status="Live">
+                  <td class="td-primary">"Life is like a box of chocolates"</td>
+                  <td class="td-secondary">Forrest Gump</td>
+                  <td>4</td>
+                  <td><span class="pill pill-blue">Beginner</span></td>
+                  <td>70</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('scene','Life is like a box of chocolates','Forrest Gump',70,'Beginner','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;color:var(--text3);font-family:var(--mono)">Showing <span id="scenes-count">5</span> of 142 scenes</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm"><i class="ti ti-chevron-left"></i></button>
+              <button class="btn btn-sm btn-primary">1</button>
+              <button class="btn btn-sm">2</button>
+              <button class="btn btn-sm">3</button>
+              <button class="btn btn-sm"><i class="ti ti-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ SONGS ══════════ -->
+      <div id="pane-songs" class="pane" style="display:none">
+        <div class="panel panel-full">
+          <div class="panel-head">
+            <div class="panel-title"><i class="ti ti-music"></i>Songs</div>
+            <div style="display:flex;gap:8px">
+              <select class="filter-select" id="song-filter" onchange="filterSongs()">
+                <option value="">All levels</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="showPane('add')"><i class="ti ti-plus"></i> Add Song</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="content-table" id="songs-table" aria-label="Songs list">
+              <thead><tr>
+                <th style="width:28%">Song</th>
+                <th style="width:20%">Artist</th>
+                <th style="width:13%">Level</th>
+                <th style="width:8%">XP</th>
+                <th style="width:12%">Plays</th>
+                <th style="width:10%">Status</th>
+                <th style="width:9%">Actions</th>
+              </tr></thead>
+              <tbody id="songs-tbody">
+                <tr data-level="Beginner">
+                  <td class="td-primary">Let It Be</td>
+                  <td class="td-secondary">The Beatles</td>
+                  <td><span class="pill pill-blue">Beginner</span></td>
+                  <td>60</td>
+                  <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">2,541</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('song','Let It Be','The Beatles',60,'Beginner','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Intermediate">
+                  <td class="td-primary">Shape of You</td>
+                  <td class="td-secondary">Ed Sheeran</td>
+                  <td><span class="pill pill-amber">Intermediate</span></td>
+                  <td>75</td>
+                  <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">3,512</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('song','Shape of You','Ed Sheeran',75,'Intermediate','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Advanced">
+                  <td class="td-primary">Blinding Lights</td>
+                  <td class="td-secondary">The Weeknd</td>
+                  <td><span class="pill pill-red">Advanced</span></td>
+                  <td>110</td>
+                  <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">—</td>
+                  <td><span class="pill pill-amber"><i class="ti ti-clock"></i>Draft</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('song','Blinding Lights','The Weeknd',110,'Advanced','Draft')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                  </div></td>
+                </tr>
+                <tr data-level="Intermediate">
+                  <td class="td-primary">Levitating</td>
+                  <td class="td-secondary">Dua Lipa</td>
+                  <td><span class="pill pill-amber">Intermediate</span></td>
+                  <td>80</td>
+                  <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">1,890</td>
+                  <td><span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span></td>
+                  <td><div class="row-actions">
+                    <button class="icon-btn" onclick="openEditModal('song','Levitating','Dua Lipa',80,'Intermediate','Live')" title="Edit"><i class="ti ti-edit"></i></button>
+                    <button class="icon-btn danger" onclick="deleteRow(this)" title="Delete"><i class="ti ti-trash"></i></button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;color:var(--text3);font-family:var(--mono)">Showing <span id="songs-count">4</span> of 89 songs</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm"><i class="ti ti-chevron-left"></i></button>
+              <button class="btn btn-sm btn-primary">1</button>
+              <button class="btn btn-sm">2</button>
+              <button class="btn btn-sm"><i class="ti ti-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ ADD CONTENT ══════════ -->
+      <div id="pane-add" class="pane" style="display:none">
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-movie"></i>Add Movie Scene</div></div>
+            <div class="add-form">
+              <div class="form-group"><label class="form-label">Movie title</label><input type="text" placeholder="e.g. Spider-Man: Homecoming" id="add-scene-movie"></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Difficulty</label>
+                  <select id="add-scene-diff"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">XP Reward</label><input type="number" placeholder="100" min="0" id="add-scene-xp"></div>
+              </div>
+              <div class="form-group"><label class="form-label">English line</label><textarea placeholder='"You've got to be kidding me."' id="add-scene-line"></textarea></div>
+              <div class="form-group"><label class="form-label">Japanese translation</label><textarea placeholder="ありえない / 嘘でしょ" id="add-scene-jp"></textarea></div>
+              <div class="form-group"><label class="form-label">Explanation (in Japanese)</label><textarea placeholder="なぜネイティブはこう言うのか..." id="add-scene-exp"></textarea></div>
+              <div class="form-group"><label class="form-label">Video URL / YouTube embed</label><input type="text" placeholder="https://youtube.com/embed/..." id="add-scene-url"></div>
+              <div class="form-submit">
+                <button class="btn" onclick="saveDraft('scene')"><i class="ti ti-device-floppy"></i> Save Draft</button>
+                <button class="btn btn-success" onclick="publishContent('scene')"><i class="ti ti-send"></i> Publish</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-music"></i>Add Song</div></div>
+            <div class="add-form">
+              <div class="form-group"><label class="form-label">Song title</label><input type="text" placeholder="e.g. Let It Be" id="add-song-title"></div>
+              <div class="form-group"><label class="form-label">Artist</label><input type="text" placeholder="e.g. The Beatles" id="add-song-artist"></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Difficulty</label>
+                  <select id="add-song-diff"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">XP Reward</label><input type="number" placeholder="60" min="0" id="add-song-xp"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Lyrics (one line per row)</label><textarea style="min-height:80px" placeholder="When I find myself in times of trouble..." id="add-song-lyrics"></textarea></div>
+              <div class="form-group"><label class="form-label">Key vocab / slang explanations</label><textarea placeholder="let it be → そのままにしておく" id="add-song-vocab"></textarea></div>
+              <div class="form-group"><label class="form-label">Spotify / YouTube link</label><input type="text" placeholder="https://..." id="add-song-url"></div>
+              <div class="form-submit">
+                <button class="btn" onclick="saveDraft('song')"><i class="ti ti-device-floppy"></i> Save Draft</button>
+                <button class="btn btn-success" onclick="publishContent('song')"><i class="ti ti-send"></i> Publish</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ USERS & XP ══════════ -->
+      <div id="pane-users" class="pane" style="display:none">
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-users"></i>Top Players by XP</div>
+              <div class="panel-action"><i class="ti ti-download"></i>Export CSV</div>
+            </div>
+            <div class="user-list" id="user-list">
+              <div class="user-row">
+                <div class="user-av">YK</div>
+                <div class="user-name">Yuki_Kaze</div>
+                <span class="pill pill-amber" style="font-size:10px">Lv 12</span>
+                <div class="user-xp" data-xp="4280">4,280 XP</div>
+                <button class="xp-btn" onclick="xpEdit(this)" title="Edit XP"><i class="ti ti-edit"></i>Edit</button>
+              </div>
+              <div class="user-row">
+                <div class="user-av alt">HN</div>
+                <div class="user-name">hana_nihongo</div>
+                <span class="pill pill-amber" style="font-size:10px">Lv 11</span>
+                <div class="user-xp" data-xp="3910">3,910 XP</div>
+                <button class="xp-btn" onclick="xpEdit(this)" title="Edit XP"><i class="ti ti-edit"></i>Edit</button>
+              </div>
+              <div class="user-row">
+                <div class="user-av alt">TM</div>
+                <div class="user-name">tomo_eigo</div>
+                <span class="pill pill-blue" style="font-size:10px">Lv 10</span>
+                <div class="user-xp" data-xp="3580">3,580 XP</div>
+                <button class="xp-btn" onclick="xpEdit(this)" title="Edit XP"><i class="ti ti-edit"></i>Edit</button>
+              </div>
+              <div class="user-row">
+                <div class="user-av alt">RS</div>
+                <div class="user-name">risa_speaks</div>
+                <span class="pill pill-blue" style="font-size:10px">Lv 9</span>
+                <div class="user-xp" data-xp="3100">3,100 XP</div>
+                <button class="xp-btn" onclick="xpEdit(this)" title="Edit XP"><i class="ti ti-edit"></i>Edit</button>
+              </div>
+              <div class="user-row">
+                <div class="user-av alt">AK</div>
+                <div class="user-name">akira_kun</div>
+                <span class="pill pill-blue" style="font-size:10px">Lv 8</span>
+                <div class="user-xp" data-xp="2870">2,870 XP</div>
+                <button class="xp-btn" onclick="xpEdit(this)" title="Edit XP"><i class="ti ti-edit"></i>Edit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-settings"></i>XP Configuration</div></div>
+            <div class="add-form">
+              <div class="xp-config-grid">
+                <div class="form-group"><label class="form-label">XP / scene completed</label><input type="number" value="80" id="xp-scene"></div>
+                <div class="form-group"><label class="form-label">XP / song completed</label><input type="number" value="60" id="xp-song"></div>
+                <div class="form-group"><label class="form-label">Streak bonus multiplier</label><input type="number" value="1.5" step="0.1" id="xp-streak"></div>
+                <div class="form-group"><label class="form-label">Daily challenge bonus</label><input type="number" value="200" id="xp-daily"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Level-up XP thresholds (comma-sep)</label><input type="text" value="500,1000,2000,3500,5500,8000" id="xp-levels"></div>
+              <div class="form-submit"><button class="btn btn-primary" onclick="showToast('XP configuration saved.')"><i class="ti ti-device-floppy"></i> Save Config</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MODERATION ══════════ -->
+      <div id="pane-flags" class="pane" style="display:none">
+        <div class="panel panel-full">
+          <div class="panel-head">
+            <div class="panel-title"><i class="ti ti-flag"></i>Flagged Content <span class="sb-badge" id="flag-count" style="position:static;margin-left:6px">5</span></div>
+            <div class="panel-action" onclick="resolveAll()"><i class="ti ti-check-all"></i>Resolve All</div>
+          </div>
+          <div class="flag-list" id="flag-list">
+            <div class="flag-item">
+              <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="flag-body">
+                <div class="flag-title">User report: "translation seems wrong" — Shape of You, line 3</div>
+                <div class="flag-meta">Reported by hana_nihongo · 2 hours ago</div>
+              </div>
+              <div class="flag-btns">
+                <button class="flag-btn flag-fix" onclick="resolveFlag(this)"><i class="ti ti-check" style="font-size:11px"></i>Fix</button>
+                <button class="flag-btn flag-dismiss" onclick="resolveFlag(this)"><i class="ti ti-x" style="font-size:11px"></i>Dismiss</button>
+              </div>
+            </div>
+            <div class="flag-item">
+              <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="flag-body">
+                <div class="flag-title">User report: "audio doesn't sync" — Spider-Man scene, line 4</div>
+                <div class="flag-meta">Reported by tomo_eigo · 5 hours ago</div>
+              </div>
+              <div class="flag-btns">
+                <button class="flag-btn flag-fix" onclick="resolveFlag(this)"><i class="ti ti-check" style="font-size:11px"></i>Fix</button>
+                <button class="flag-btn flag-dismiss" onclick="resolveFlag(this)"><i class="ti ti-x" style="font-size:11px"></i>Dismiss</button>
+              </div>
+            </div>
+            <div class="flag-item">
+              <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="flag-body">
+                <div class="flag-title">User report: "pronunciation guide missing" — Let It Be, line 7</div>
+                <div class="flag-meta">Reported by akira_kun · 1 day ago</div>
+              </div>
+              <div class="flag-btns">
+                <button class="flag-btn flag-fix" onclick="resolveFlag(this)"><i class="ti ti-check" style="font-size:11px"></i>Fix</button>
+                <button class="flag-btn flag-dismiss" onclick="resolveFlag(this)"><i class="ti ti-x" style="font-size:11px"></i>Dismiss</button>
+              </div>
+            </div>
+            <div class="flag-item">
+              <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="flag-body">
+                <div class="flag-title">User report: "wrong slang breakdown" — Inception, line 2</div>
+                <div class="flag-meta">Reported by risa_speaks · 1 day ago</div>
+              </div>
+              <div class="flag-btns">
+                <button class="flag-btn flag-fix" onclick="resolveFlag(this)"><i class="ti ti-check" style="font-size:11px"></i>Fix</button>
+                <button class="flag-btn flag-dismiss" onclick="resolveFlag(this)"><i class="ti ti-x" style="font-size:11px"></i>Dismiss</button>
+              </div>
+            </div>
+            <div class="flag-item">
+              <div class="flag-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="flag-body">
+                <div class="flag-title">User report: "Japanese explanation unclear" — Good Will Hunting, line 1</div>
+                <div class="flag-meta">Reported by Yuki_Kaze · 2 days ago</div>
+              </div>
+              <div class="flag-btns">
+                <button class="flag-btn flag-fix" onclick="resolveFlag(this)"><i class="ti ti-check" style="font-size:11px"></i>Fix</button>
+                <button class="flag-btn flag-dismiss" onclick="resolveFlag(this)"><i class="ti ti-x" style="font-size:11px"></i>Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ ANALYTICS ══════════ -->
+      <div id="pane-analytics" class="pane" style="display:none">
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-clock"></i>Avg Session Length</div>
+            <div class="metric-value">8.4 min</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +1.2 min vs last week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-repeat"></i>Day 7 Retention</div>
+            <div class="metric-value">61%</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +4% vs last week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-microphone"></i>Avg Pronunciation</div>
+            <div class="metric-value">74%</div>
+            <div class="metric-delta delta-up"><i class="ti ti-trending-up" style="font-size:11px"></i> +2% this week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label"><i class="ti ti-flame"></i>Avg Streak</div>
+            <div class="metric-value">9 days</div>
+            <div class="metric-delta delta-dn"><i class="ti ti-trending-down" style="font-size:11px"></i> −1 vs last week</div>
+          </div>
+        </div>
+
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-map-pin"></i>Drop-off by Step</div></div>
+            <div class="chart-area">
+              <div class="chart-bar-row"><span class="chart-label">Land on scene</span><div class="chart-track"><div class="chart-fill" style="width:100%"></div></div><span class="chart-val">100%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Watch clip</span><div class="chart-track"><div class="chart-fill" style="width:88%"></div></div><span class="chart-val">88%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Read breakdown</span><div class="chart-track"><div class="chart-fill" style="width:74%"></div></div><span class="chart-val">74%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Try shadowing</span><div class="chart-track"><div class="chart-fill" style="width:52%"></div></div><span class="chart-val">52%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Complete scene</span><div class="chart-track"><div class="chart-fill" style="width:41%"></div></div><span class="chart-val">41%</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-trophy"></i>Mode Popularity</div></div>
+            <div class="chart-area">
+              <div class="chart-bar-row"><span class="chart-label">Movie mode</span><div class="chart-track"><div class="chart-fill green" style="width:100%"></div></div><span class="chart-val">43%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Music mode</span><div class="chart-track"><div class="chart-fill green" style="width:74%"></div></div><span class="chart-val">32%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Speed round</span><div class="chart-track"><div class="chart-fill green" style="width:37%"></div></div><span class="chart-val">16%</span></div>
+              <div class="chart-bar-row"><span class="chart-label">Battle mode</span><div class="chart-track"><div class="chart-fill green" style="width:21%"></div></div><span class="chart-val">9%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-full">
+          <div class="panel-head"><div class="panel-title"><i class="ti ti-grid-3x3"></i>Retention Cohort (Week × Day)</div></div>
+          <div class="retention-grid">
+            <div class="ret-cell ret-hdr">Week</div>
+            <div class="ret-cell ret-hdr">D0</div>
+            <div class="ret-cell ret-hdr">D1</div>
+            <div class="ret-cell ret-hdr">D3</div>
+            <div class="ret-cell ret-hdr">D7</div>
+            <div class="ret-cell ret-hdr">D14</div>
+            <div class="ret-cell ret-hdr">D21</div>
+            <div class="ret-cell ret-hdr">D30</div>
+
+            <div class="ret-cell ret-hdr" style="font-size:9px">W1</div>
+            <div class="ret-cell ret-100" title="D0: 100%">100</div>
+            <div class="ret-cell ret-80" title="D1: 78%">78</div>
+            <div class="ret-cell ret-60" title="D3: 65%">65</div>
+            <div class="ret-cell ret-60" title="D7: 61%">61</div>
+            <div class="ret-cell ret-40" title="D14: 48%">48</div>
+            <div class="ret-cell ret-40" title="D21: 39%">39</div>
+            <div class="ret-cell ret-20" title="D30: 28%">28</div>
+
+            <div class="ret-cell ret-hdr" style="font-size:9px">W2</div>
+            <div class="ret-cell ret-100" title="D0: 100%">100</div>
+            <div class="ret-cell ret-80" title="D1: 76%">76</div>
+            <div class="ret-cell ret-60" title="D3: 63%">63</div>
+            <div class="ret-cell ret-60" title="D7: 59%">59</div>
+            <div class="ret-cell ret-40" title="D14: 45%">45</div>
+            <div class="ret-cell ret-40" title="D21: 36%">36</div>
+            <div class="ret-cell ret-20" title="D30: 25%">25</div>
+
+            <div class="ret-cell ret-hdr" style="font-size:9px">W3</div>
+            <div class="ret-cell ret-100" title="D0: 100%">100</div>
+            <div class="ret-cell ret-80" title="D1: 80%">80</div>
+            <div class="ret-cell ret-60" title="D3: 68%">68</div>
+            <div class="ret-cell ret-60" title="D7: 64%">64</div>
+            <div class="ret-cell ret-40" title="D14: 50%">50</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+
+            <div class="ret-cell ret-hdr" style="font-size:9px">W4</div>
+            <div class="ret-cell ret-100" title="D0: 100%">100</div>
+            <div class="ret-cell ret-80" title="D1: 82%">82</div>
+            <div class="ret-cell ret-80" title="D3: 70%">70</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+            <div class="ret-cell ret-0" title="—">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ SETTINGS ══════════ -->
+      <div id="pane-settings" class="pane" style="display:none">
+        <div class="panels">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-palette"></i>App Settings</div></div>
+            <div class="add-form">
+              <div class="form-group"><label class="form-label">App Display Name</label><input type="text" value="Ekaidan" id="cfg-name"></div>
+              <div class="form-group"><label class="form-label">Default UI Language</label>
+                <select id="cfg-lang"><option>English</option><option>Japanese</option><option>Both</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">Target learner language</label>
+                <select id="cfg-target"><option>Japanese → English</option><option>English → Japanese</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">Max daily XP cap</label><input type="number" value="1000" id="cfg-xpcap"></div>
+              <div class="form-submit"><button class="btn btn-primary" onclick="showToast('App settings saved.')"><i class="ti ti-device-floppy"></i> Save Settings</button></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title"><i class="ti ti-bell"></i>Notification Rules</div></div>
+            <div class="add-form">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px">
+                  Email on new flag reports
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px">
+                  Notify when content goes live
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" style="accent-color:var(--accent);width:16px;height:16px">
+                  Weekly analytics digest
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px">
+                  New user milestone alerts
+                </label>
+              </div>
+              <div class="form-group" style="margin-top:4px"><label class="form-label">Alert email address</label><input type="email" placeholder="admin@ekaidan.app" id="cfg-email"></div>
+              <div class="form-submit"><button class="btn btn-primary" onclick="showToast('Notification settings saved.')"><i class="ti ti-device-floppy"></i> Save</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-full" style="margin-top:0">
+          <div class="panel-head"><div class="panel-title"><i class="ti ti-database"></i>Database & Integrations</div></div>
+          <div class="add-form" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group"><label class="form-label">Supabase Project URL</label><input type="text" placeholder="https://xxxx.supabase.co" id="cfg-supa-url"></div>
+            <div class="form-group"><label class="form-label">Supabase Anon Key</label><input type="password" placeholder="••••••••••••••••••••••" id="cfg-supa-key"></div>
+            <div class="form-group"><label class="form-label">Cloudinary Cloud Name</label><input type="text" placeholder="my-cloud" id="cfg-cdn"></div>
+            <div class="form-group"><label class="form-label">YouTube Data API Key</label><input type="password" placeholder="••••••••••••••••••••••" id="cfg-yt"></div>
+          </div>
+          <div style="padding:0 18px 16px;display:flex;justify-content:flex-end">
+            <button class="btn btn-primary" onclick="showToast('Integration keys saved securely.')"><i class="ti ti-link"></i> Save Integrations</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .content -->
+  </div><!-- .main -->
+</div><!-- .shell -->
+
+<script>
+/* ── NAVIGATION ── */
+const PANES = {
+  overview:  'Dashboard',
+  scenes:    'Movie Scenes',
+  songs:     'Songs',
+  add:       'Add Content',
+  users:     'Users & XP',
+  flags:     'Moderation',
+  analytics: 'Analytics',
+  settings:  'Settings',
+};
+
+function showPane(id, el){
+  Object.keys(PANES).forEach(k=>{
+    const p = document.getElementById('pane-'+k);
+    if(p) p.style.display = k===id ? '' : 'none';
+  });
+  document.getElementById('page-title').textContent = PANES[id] || id;
+  document.getElementById('page-breadcrumb').textContent = (PANES[id]||id).toUpperCase();
+  document.querySelectorAll('.sb-item[data-pane]').forEach(i=>i.classList.remove('active'));
+  const active = document.querySelector(`.sb-item[data-pane="${id}"]`);
+  if(active) active.classList.add('active');
+}
+
+// Sidebar click delegation
+document.querySelectorAll('.sb-item[data-pane]').forEach(item=>{
+  item.addEventListener('click',()=>showPane(item.dataset.pane));
+});
+
+/* ── TOAST ── */
+let toastTimer;
+function showToast(msg='Done.'){
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toast-msg');
+  m.textContent = msg;
+  t.style.display = 'flex';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.style.display='none', 3200);
+}
+
+/* ── DELETE ROW ── */
+function deleteRow(btn){
+  if(!confirm('Delete this item?')) return;
+  const row = btn.closest('tr');
+  row.style.transition = 'opacity 0.3s,transform 0.3s';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(10px)';
+  setTimeout(()=>{row.remove(); updateCounts();}, 300);
+  showToast('Item deleted.');
+}
+
+/* ── TOGGLE STATUS ── */
+function toggleStatus(btn){
+  const row = btn.closest('tr');
+  const pill = row.querySelector('td:nth-child(6) .pill');
+  if(!pill) return;
+  const isLive = pill.classList.contains('pill-green');
+  pill.className = isLive ? 'pill pill-amber' : 'pill pill-green';
+  pill.innerHTML = isLive
+    ? '<i class="ti ti-clock"></i>Draft'
+    : '<i class="ti ti-circle-check"></i>Live';
+  row.dataset.status = isLive ? 'Draft' : 'Live';
+  showToast(`Status changed to ${isLive?'Draft':'Live'}.`);
+}
+
+/* ── RESOLVE FLAG ── */
+function resolveFlag(btn){
+  const item = btn.closest('.flag-item');
+  item.style.transition = 'opacity 0.3s,height 0.3s';
+  item.style.opacity = '0';
+  setTimeout(()=>{
+    item.remove();
+    updateFlagCount();
+  }, 300);
+}
+
+function resolveAll(){
+  const items = document.querySelectorAll('.flag-item');
+  items.forEach((item,i)=>{
+    setTimeout(()=>{
+      item.style.transition = 'opacity 0.25s';
+      item.style.opacity = '0';
+      setTimeout(()=>item.remove(), 250);
+    }, i*80);
+  });
+  setTimeout(()=>{updateFlagCount(); showToast('All flags resolved.');}, items.length*80+300);
+}
+
+function updateFlagCount(){
+  const n = document.querySelectorAll('.flag-item').length;
+  ['flag-count','flag-badge'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = n;
+  });
+}
+
+/* ── XP EDIT ── */
+function xpEdit(btn){
+  const row = btn.closest('.user-row');
+  const xpDiv = row.querySelector('.user-xp');
+  const cur = parseInt(xpDiv.dataset.xp)||0;
+  const val = prompt('Set XP for this user:', cur);
+  if(val===null) return;
+  const n = parseInt(val);
+  if(isNaN(n)||n<0){alert('Invalid XP value.');return;}
+  xpDiv.dataset.xp = n;
+  xpDiv.textContent = n.toLocaleString()+' XP';
+  showToast('XP updated to '+n.toLocaleString()+'.');
+}
+
+/* ── FILTER SCENES ── */
+function filterScenes(){
+  const lvl = document.getElementById('scene-filter').value;
+  const st  = document.getElementById('scene-status').value;
+  const rows = document.querySelectorAll('#scenes-tbody tr');
+  let visible = 0;
+  rows.forEach(r=>{
+    const rowLvl = r.dataset.level||'';
+    const rowSt  = r.dataset.status||'';
+    const show = (!lvl||rowLvl===lvl) && (!st||rowSt===st);
+    r.style.display = show?'':'none';
+    if(show) visible++;
+  });
+  const el = document.getElementById('scenes-count');
+  if(el) el.textContent = visible;
+}
+
+/* ── FILTER SONGS ── */
+function filterSongs(){
+  const lvl = document.getElementById('song-filter').value;
+  const rows = document.querySelectorAll('#songs-tbody tr');
+  let visible = 0;
+  rows.forEach(r=>{
+    const rowLvl = r.dataset.level||'';
+    const show = !lvl || rowLvl===lvl;
+    r.style.display = show?'':'none';
+    if(show) visible++;
+  });
+  const el = document.getElementById('songs-count');
+  if(el) el.textContent = visible;
+}
+
+/* ── UPDATE COUNTS ── */
+function updateCounts(){
+  const sc = document.querySelectorAll('#scenes-tbody tr:not([style*="display: none"])').length;
+  const sg = document.querySelectorAll('#songs-tbody tr:not([style*="display: none"])').length;
+  const sel = document.getElementById('scenes-count');
+  const sgel = document.getElementById('songs-count');
+  if(sel) sel.textContent = sc;
+  if(sgel) sgel.textContent = sg;
+}
+
+/* ── PUBLISH / DRAFT ── */
+function publishContent(type){
+  const title = type==='scene'
+    ? document.getElementById('add-scene-movie').value
+    : document.getElementById('add-song-title').value;
+  if(!title.trim()){alert('Please fill in the required fields.');return;}
+  showToast(`"${title}" published and live for players.`);
+  // Clear form
+  document.querySelectorAll(`#pane-add input, #pane-add textarea`).forEach(el=>el.value='');
+}
+
+function saveDraft(type){
+  showToast('Saved as draft — not yet live.');
+}
+
+/* ── EDIT MODAL ── */
+function openEditModal(type, title, secondary, xp, level, status){
+  document.getElementById('modal-title').textContent = 'Edit '+(type==='scene'?'Scene':'Song');
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group"><label class="form-label">${type==='scene'?'Movie':'Artist'}</label>
+      <input type="text" value="${secondary}" id="m-secondary"></div>
+    <div class="form-group"><label class="form-label">${type==='scene'?'Scene line':'Song title'}</label>
+      <input type="text" value="${title}" id="m-title"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Difficulty</label>
+        <select id="m-level">
+          <option${level==='Beginner'?' selected':''}>Beginner</option>
+          <option${level==='Intermediate'?' selected':''}>Intermediate</option>
+          <option${level==='Advanced'?' selected':''}>Advanced</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">XP Reward</label>
+        <input type="number" value="${xp}" id="m-xp" min="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Status</label>
+      <select id="m-status">
+        <option${status==='Live'?' selected':''}>Live</option>
+        <option${status==='Draft'?' selected':''}>Draft</option>
+      </select>
+    </div>
+  `;
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveModal(){
+  closeModal();
+  showToast('Changes saved successfully.');
+}
+
+// Close modal on overlay click
+document.getElementById('edit-modal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+
+/* ── GLOBAL SEARCH ── */
+document.getElementById('global-search').addEventListener('input',function(){
+  const q = this.value.trim().toLowerCase();
+  if(!q) return;
+  // Simple highlight in current visible pane's table rows
+  document.querySelectorAll('.content-table tbody tr').forEach(r=>{
+    const text = r.textContent.toLowerCase();
+    r.style.display = text.includes(q)?'':'none';
+  });
+  if(!q){
+    document.querySelectorAll('.content-table tbody tr').forEach(r=>r.style.display='');
+  }
+});
+
+document.getElementById('global-search').addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    this.value='';
+    document.querySelectorAll('.content-table tbody tr').forEach(r=>r.style.display='');
+  }
+});
+
+/* ── INIT ── */
+showPane('overview');
+</script>
+</body>
+</html>
