@@ -84,6 +84,15 @@ function showToast(msg) {
 
 function publishSong() {
 
+
+    let youtubeId = "";
+
+if (link.includes("youtube.com")) {
+  youtubeId = link.split("v=")[1]?.split("&")[0];
+} else if (link.includes("youtu.be")) {
+  youtubeId = link.split("/").pop().split("?")[0];
+}
+
   // 1. Get existing songs (or empty array)
   const songs = JSON.parse(localStorage.getItem('songs')) || [];
 
@@ -139,9 +148,7 @@ function publishSong() {
   document.getElementById('song-lyrics').value = "";
   document.getElementById('song-vocab').value = "";
   document.getElementById('song-link').value = "";
+
+
+
 }
-
-const container = document.querySelector('.scenes-container');
-if (!container) return;
-
-container.innerHTML = ...
