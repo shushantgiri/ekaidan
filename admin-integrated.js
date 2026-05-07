@@ -1,105 +1,107 @@
 // =====================================================
 // EKAIDAN — admin-integrated.js
-// Wires the admin panel's Publish buttons to localStorage
-// and renders scenes/songs tables from real data
+// Admin panel: publish/edit/delete via Supabase
 // =====================================================
 
-/* ══════════════════════════════════════
-   PILL HELPERS
-══════════════════════════════════════ */
+/* ══ PILL HELPERS ══ */
 function levelPill(level) {
   const map = { Beginner: 'pill-blue', Intermediate: 'pill-amber', Advanced: 'pill-red' };
-  const cls = map[level] || 'pill-violet';
-  return `<span class="pill ${cls}">${level}</span>`;
+  return `<span class="pill ${map[level] || 'pill-violet'}">${level || '—'}</span>`;
 }
-
 function statusPill(status) {
-  if (status === 'Live') {
-    return `<span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span>`;
-  }
-  return `<span class="pill pill-amber"><i class="ti ti-clock"></i>Draft</span>`;
+  return status === 'Live'
+    ? `<span class="pill pill-green"><i class="ti ti-circle-check"></i>Live</span>`
+    : `<span class="pill pill-amber"><i class="ti ti-clock"></i>Draft</span>`;
 }
 
-/* ══════════════════════════════════════
-   RENDER SCENES TABLE
-══════════════════════════════════════ */
-function renderScenes() {
+/* ══ RENDER SCENES TABLE ══ */
+async function renderScenes() {
   const tbody = document.getElementById('scenes-tbody');
   if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Loading…</td></tr>`;
 
-  const scenes = DB.getScenes();
-  tbody.innerHTML = '';
+  try {
+    const scenes = await DB.getScenes();
+    tbody.innerHTML = '';
 
-  scenes.forEach(scene => {
-    const tr = document.createElement('tr');
-    tr.dataset.level = scene.level || '';
-    tr.dataset.status = scene.status || 'Live';
+    if (scenes.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">No scenes yet. Add one above.</td></tr>`;
+    }
 
-    tr.innerHTML = `
-      <td class="td-primary">${scene.title}</td>
-      <td class="td-secondary">${scene.movie || '—'}</td>
-      <td>${scene.lines || '—'}</td>
-      <td>${levelPill(scene.level)}</td>
-      <td>${scene.xp}</td>
-      <td>${statusPill(scene.status)}</td>
-      <td>
-        <div class="row-actions">
-          <button class="icon-btn" onclick="editScene(${scene.id})" title="Edit"><i class="ti ti-edit"></i></button>
-          <button class="icon-btn danger" onclick="deleteScene(${scene.id})" title="Delete"><i class="ti ti-trash"></i></button>
-          <button class="icon-btn" onclick="toggleSceneStatus(${scene.id}, this)" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
-        </div>
-      </td>
-    `;
+    scenes.forEach(scene => {
+      const tr = document.createElement('tr');
+      tr.dataset.level  = scene.level  || '';
+      tr.dataset.status = scene.status || 'Live';
+      tr.dataset.id     = scene.id;
+      tr.innerHTML = `
+        <td class="td-primary">${scene.title || '—'}</td>
+        <td class="td-secondary">${scene.movie || '—'}</td>
+        <td>—</td>
+        <td>${levelPill(scene.level)}</td>
+        <td>${scene.xp || 0}</td>
+        <td>${statusPill(scene.status)}</td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" onclick="editScene(${scene.id})" title="Edit"><i class="ti ti-edit"></i></button>
+            <button class="icon-btn danger" onclick="deleteScene(${scene.id})" title="Delete"><i class="ti ti-trash"></i></button>
+            <button class="icon-btn" onclick="toggleSceneStatus(${scene.id},'${scene.status}')" title="Toggle status"><i class="ti ti-toggle-right"></i></button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
 
-    tbody.appendChild(tr);
-  });
-
-  const countEl = document.getElementById('scenes-count');
-  if (countEl) countEl.textContent = scenes.length;
+    const el = document.getElementById('scenes-count');
+    if (el) el.textContent = scenes.length;
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--red);padding:16px">Error loading scenes: ${e.message}</td></tr>`;
+  }
 }
 
-/* ══════════════════════════════════════
-   RENDER SONGS TABLE
-══════════════════════════════════════ */
-function renderSongs() {
+/* ══ RENDER SONGS TABLE ══ */
+async function renderSongs() {
   const tbody = document.getElementById('songs-tbody');
   if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">Loading…</td></tr>`;
 
-  const songs = DB.getSongs();
-  tbody.innerHTML = '';
+  try {
+    const songs = await DB.getSongs();
+    tbody.innerHTML = '';
 
-  songs.forEach(song => {
-    const level = song.difficulty || song.level || 'Beginner';
-    const status = song.status || 'Live';
-    const tr = document.createElement('tr');
-    tr.dataset.level = level;
+    if (songs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">No songs yet. Add one above.</td></tr>`;
+    }
 
-    tr.innerHTML = `
-      <td class="td-primary">${song.title}</td>
-      <td class="td-secondary">${song.artist || '—'}</td>
-      <td>${levelPill(level)}</td>
-      <td>${song.xp || 0}</td>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">—</td>
-      <td>${statusPill(status)}</td>
-      <td>
-        <div class="row-actions">
-          <button class="icon-btn" onclick="editSong(${song.id})" title="Edit"><i class="ti ti-edit"></i></button>
-          <button class="icon-btn danger" onclick="deleteSong(${song.id})" title="Delete"><i class="ti ti-trash"></i></button>
-        </div>
-      </td>
-    `;
+    songs.forEach(song => {
+      const level  = song.difficulty || song.level || 'Beginner';
+      const status = song.status || 'Live';
+      const tr = document.createElement('tr');
+      tr.dataset.level = level;
+      tr.dataset.id    = song.id;
+      tr.innerHTML = `
+        <td class="td-primary">${song.title || '—'}</td>
+        <td class="td-secondary">${song.artist || '—'}</td>
+        <td>${levelPill(level)}</td>
+        <td>${song.xp || 0}</td>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">—</td>
+        <td>${statusPill(status)}</td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" onclick="editSong(${song.id})" title="Edit"><i class="ti ti-edit"></i></button>
+            <button class="icon-btn danger" onclick="deleteSong(${song.id})" title="Delete"><i class="ti ti-trash"></i></button>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
 
-    tbody.appendChild(tr);
-  });
-
-  const countEl = document.getElementById('songs-count');
-  if (countEl) countEl.textContent = songs.length;
+    const el = document.getElementById('songs-count');
+    if (el) el.textContent = songs.length;
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--red);padding:16px">Error loading songs: ${e.message}</td></tr>`;
+  }
 }
 
-/* ══════════════════════════════════════
-   PUBLISH SCENE  (replaces fake stub)
-══════════════════════════════════════ */
-function publishContent(type, asDraft) {
+/* ══ PUBLISH SCENE ══ */
+async function publishContent(type, asDraft = false) {
   if (type === 'scene') {
     const movie  = document.getElementById('add-scene-movie')?.value?.trim();
     const line   = document.getElementById('add-scene-line')?.value?.trim();
@@ -111,29 +113,30 @@ function publishContent(type, asDraft) {
 
     if (!movie) { alert('Please fill in the Movie title.'); return; }
 
-    const scenes = DB.getScenes();
-    scenes.push({
-      id: Date.now(),
-      title: line || movie,
-      movie,
-      level: diff,
-      xp,
-      status: asDraft ? 'Draft' : 'Live',
-      line,
-      jp,
-      explanation: exp,
-      videoUrl: url
-    });
-    DB.saveScenes(scenes);
-    renderScenes();
+    showToast('Saving…');
+    try {
+      await DB.insertScene({
+        id:          Date.now(),
+        title:       line || movie,
+        movie,
+        level:       diff,
+        xp,
+        status:      asDraft ? 'Draft' : 'Live',
+        line,
+        jp,
+        explanation: exp,
+        video_url:   url
+      });
 
-    // Clear form
-    ['add-scene-movie','add-scene-line','add-scene-jp','add-scene-exp','add-scene-url'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
+      ['add-scene-movie','add-scene-line','add-scene-jp','add-scene-exp','add-scene-url'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
 
-    showToast(asDraft ? 'Scene saved as draft.' : `"${movie}" published and live for players! 🎬`);
+      await renderScenes();
+      showToast(asDraft ? 'Scene saved as draft.' : `"${movie}" is now live! 🎬`);
+    } catch(e) {
+      showToast('Error: ' + e.message);
+    }
 
   } else if (type === 'song') {
     const title  = document.getElementById('add-song-title')?.value?.trim();
@@ -146,109 +149,96 @@ function publishContent(type, asDraft) {
 
     if (!title || !artist) { alert('Please fill in Song title and Artist.'); return; }
 
-    // Extract YouTube ID from URL
+    // Extract YouTube ID
     let youtubeId = '';
     if (url) {
       if (url.includes('youtube.com')) youtubeId = url.split('v=')[1]?.split('&')[0] || '';
       else if (url.includes('youtu.be')) youtubeId = url.split('/').pop().split('?')[0] || '';
-      else youtubeId = url; // assume raw ID was pasted
+      else youtubeId = url; // assume raw ID
     }
 
-    const songs = DB.getSongs();
-    songs.push({
-      id: Date.now(),
-      title,
-      artist,
-      difficulty: diff,
-      level: diff,
-      xp,
-      status: asDraft ? 'Draft' : 'Live',
-      lyrics: lyrics ? lyrics.split('\n').filter(l => l.trim()) : [],
-      vocab,
-      youtubeId,
-      youtubeUrl: url
-    });
-    DB.saveSongs(songs);
-    renderSongs();
+    showToast('Saving…');
+    try {
+      await DB.insertSong({
+        id:         Date.now(),
+        title,
+        artist,
+        difficulty: diff,
+        xp,
+        status:     asDraft ? 'Draft' : 'Live',
+        lyrics:     lyrics ? lyrics.split('\n').filter(l => l.trim()) : [],
+        vocab,
+        youtube_id: youtubeId
+      });
 
-    // Clear form
-    ['add-song-title','add-song-artist','add-song-lyrics','add-song-vocab','add-song-url'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
+      ['add-song-title','add-song-artist','add-song-lyrics','add-song-vocab','add-song-url'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
 
-    showToast(asDraft ? 'Song saved as draft.' : `"${title}" published and live for players! 🎵`);
+      await renderSongs();
+      showToast(asDraft ? 'Song saved as draft.' : `"${title}" is now live! 🎵`);
+    } catch(e) {
+      showToast('Error: ' + e.message);
+    }
   }
 }
 
-/* ── Override saveDraft to use real logic ── */
-function saveDraft(type) {
-  publishContent(type, true);
-}
+function saveDraft(type) { publishContent(type, true); }
 
-/* ══════════════════════════════════════
-   DELETE
-══════════════════════════════════════ */
-function deleteScene(id) {
+/* ══ DELETE ══ */
+async function deleteScene(id) {
   if (!confirm('Delete this scene?')) return;
-  DB.saveScenes(DB.getScenes().filter(s => s.id !== id));
-  renderScenes();
-  showToast('Scene deleted.');
+  try {
+    await DB.deleteScene(id);
+    await renderScenes();
+    showToast('Scene deleted.');
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
-function deleteSong(id) {
+async function deleteSong(id) {
   if (!confirm('Delete this song?')) return;
-  DB.saveSongs(DB.getSongs().filter(s => s.id !== id));
-  renderSongs();
-  showToast('Song deleted.');
+  try {
+    await DB.deleteSong(id);
+    await renderSongs();
+    showToast('Song deleted.');
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
-/* ══════════════════════════════════════
-   TOGGLE SCENE STATUS
-══════════════════════════════════════ */
-function toggleSceneStatus(id, btn) {
-  const scenes = DB.getScenes();
-  const scene = scenes.find(s => s.id === id);
-  if (!scene) return;
-  scene.status = scene.status === 'Live' ? 'Draft' : 'Live';
-  DB.saveScenes(scenes);
-  renderScenes();
-  showToast(`Status changed to ${scene.status}.`);
+/* ══ TOGGLE STATUS ══ */
+async function toggleSceneStatus(id, currentStatus) {
+  const newStatus = currentStatus === 'Live' ? 'Draft' : 'Live';
+  try {
+    await DB.updateScene(id, { status: newStatus });
+    await renderScenes();
+    showToast(`Status changed to ${newStatus}.`);
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
-/* ══════════════════════════════════════
-   EDIT (opens modal with real data)
-══════════════════════════════════════ */
-function editScene(id) {
-  const scene = DB.getScenes().find(s => s.id === id);
-  if (!scene) return;
-  openEditModal('scene', scene.title, scene.movie, scene.xp, scene.level, scene.status, id);
-}
-
-function editSong(id) {
-  const song = DB.getSongs().find(s => s.id === id);
-  if (!song) return;
-  openEditModal('song', song.title, song.artist, song.xp, song.difficulty || song.level, song.status, id);
-}
-
-/* ══════════════════════════════════════
-   SAVE MODAL (persist edits)
-══════════════════════════════════════ */
-let _editId = null;
+/* ══ EDIT MODAL ══ */
+let _editId   = null;
 let _editType = null;
 
-const _origOpenEditModal = typeof openEditModal === 'function' ? openEditModal : null;
-
-function openEditModal(type, title, secondary, xp, level, status, id) {
+async function editScene(id) {
+  const scenes = await DB.getScenes();
+  const scene  = scenes.find(s => s.id === id);
+  if (!scene) return;
   _editId   = id;
-  _editType = type;
+  _editType = 'scene';
+  openEditModal('scene', scene.title, scene.movie, scene.xp, scene.level, scene.status);
+}
 
-  const titleEl = document.getElementById('modal-title');
-  const bodyEl  = document.getElementById('modal-body');
-  if (!titleEl || !bodyEl) return;
+async function editSong(id) {
+  const songs = await DB.getSongs();
+  const song  = songs.find(s => s.id === id);
+  if (!song) return;
+  _editId   = id;
+  _editType = 'song';
+  openEditModal('song', song.title, song.artist, song.xp, song.difficulty, song.status);
+}
 
-  titleEl.textContent = 'Edit ' + (type === 'scene' ? 'Scene' : 'Song');
-  bodyEl.innerHTML = `
+function openEditModal(type, title, secondary, xp, level, status) {
+  document.getElementById('modal-title').textContent = 'Edit ' + (type === 'scene' ? 'Scene' : 'Song');
+  document.getElementById('modal-body').innerHTML = `
     <div class="form-group">
       <label class="form-label">${type === 'scene' ? 'Movie' : 'Artist'}</label>
       <input type="text" value="${secondary || ''}" id="m-secondary">
@@ -261,81 +251,90 @@ function openEditModal(type, title, secondary, xp, level, status, id) {
       <div class="form-group">
         <label class="form-label">Difficulty</label>
         <select id="m-level">
-          <option${level === 'Beginner' ? ' selected' : ''}>Beginner</option>
-          <option${level === 'Intermediate' ? ' selected' : ''}>Intermediate</option>
-          <option${level === 'Advanced' ? ' selected' : ''}>Advanced</option>
+          <option${level==='Beginner'?' selected':''}>Beginner</option>
+          <option${level==='Intermediate'?' selected':''}>Intermediate</option>
+          <option${level==='Advanced'?' selected':''}>Advanced</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">XP Reward</label>
-        <input type="number" value="${xp}" id="m-xp" min="0">
+        <input type="number" value="${xp || 0}" id="m-xp" min="0">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Status</label>
       <select id="m-status">
-        <option${status === 'Live' ? ' selected' : ''}>Live</option>
-        <option${status === 'Draft' ? ' selected' : ''}>Draft</option>
+        <option${status==='Live'?' selected':''}>Live</option>
+        <option${status==='Draft'?' selected':''}>Draft</option>
       </select>
-    </div>
-  `;
-
+    </div>`;
   document.getElementById('edit-modal').classList.add('open');
 }
 
-function saveModal() {
+async function saveModal() {
   const title     = document.getElementById('m-title')?.value?.trim();
   const secondary = document.getElementById('m-secondary')?.value?.trim();
   const level     = document.getElementById('m-level')?.value;
   const xp        = Number(document.getElementById('m-xp')?.value) || 0;
   const status    = document.getElementById('m-status')?.value;
 
-  if (_editType === 'scene') {
-    const scenes = DB.getScenes();
-    const idx = scenes.findIndex(s => s.id === _editId);
-    if (idx !== -1) {
-      scenes[idx] = { ...scenes[idx], title, movie: secondary, level, xp, status };
-      DB.saveScenes(scenes);
-      renderScenes();
+  try {
+    if (_editType === 'scene') {
+      await DB.updateScene(_editId, { title, movie: secondary, level, xp, status });
+      await renderScenes();
+    } else {
+      await DB.updateSong(_editId, { title, artist: secondary, difficulty: level, xp, status });
+      await renderSongs();
     }
-  } else if (_editType === 'song') {
-    const songs = DB.getSongs();
-    const idx = songs.findIndex(s => s.id === _editId);
-    if (idx !== -1) {
-      songs[idx] = { ...songs[idx], title, artist: secondary, difficulty: level, level, xp, status };
-      DB.saveSongs(songs);
-      renderSongs();
-    }
-  }
-
-  closeModal();
-  showToast('Changes saved successfully.');
+    closeModal();
+    showToast('Changes saved.');
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
-/* ══════════════════════════════════════
-   TOAST (safe override)
-══════════════════════════════════════ */
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+/* ══ TOAST ══ */
 let _toastTimer;
 function showToast(msg) {
   const toast = document.getElementById('toast');
   const msgEl = document.getElementById('toast-msg');
-  if (!toast || !msgEl) { console.log('[Toast]', msg); return; }
+  if (!toast || !msgEl) return;
   msgEl.textContent = msg;
   toast.style.display = 'flex';
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => toast.style.display = 'none', 3200);
 }
 
-/* ══════════════════════════════════════
-   INIT — render tables on page load
-══════════════════════════════════════ */
+/* ══ FILTER ══ */
+function filterScenes() {
+  const lvl = document.getElementById('scene-filter').value;
+  const st  = document.getElementById('scene-status').value;
+  let visible = 0;
+  document.querySelectorAll('#scenes-tbody tr').forEach(r => {
+    const show = (!lvl || r.dataset.level === lvl) && (!st || r.dataset.status === st);
+    r.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const el = document.getElementById('scenes-count');
+  if (el) el.textContent = visible;
+}
+
+function filterSongs() {
+  const lvl = document.getElementById('song-filter').value;
+  let visible = 0;
+  document.querySelectorAll('#songs-tbody tr').forEach(r => {
+    const show = !lvl || r.dataset.level === lvl;
+    r.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const el = document.getElementById('songs-count');
+  if (el) el.textContent = visible;
+}
+
+/* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded', () => {
   renderScenes();
   renderSongs();
 });
-
-// Also fire immediately in case DOMContentLoaded already fired
-if (document.readyState !== 'loading') {
-  renderScenes();
-  renderSongs();
-}
