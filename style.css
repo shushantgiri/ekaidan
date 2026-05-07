@@ -139,3 +139,78 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 2
 .cta-ghost{background:transparent;color:#000;border:2px solid rgba(0,0,0,0.2);padding:11px 24px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
 
 footer{border-top:0.5px solid var(--border);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--txt3)}
+
+
+/* GRID */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* CARD */
+.card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* FORM */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #aaa;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row > div {
+  flex: 1;
+}
+
+/* INPUTS */
+input, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #0b0b0b;
+  color: #fff;
+}
+
+/* BUTTON */
+.btn-primary {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4fa3ff, #7b61ff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+
+
+@media (max-width: 800px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
