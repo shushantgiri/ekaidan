@@ -1,30 +1,214 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta property="og:title" content="Ekaidan - Learn English from Movies & Music">
-<meta property="og:description" content="Master real English using movie scenes and songs.">
-<meta property="og:image" content="https://imgs.search.brave.com/Rx2H4mDnxy3ZunKGQJCaCO_kKD9j202tP4jf_pyUfj8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/Y3JlYXRlLnZpc3Rh/LmNvbS9kb3dubG9h/ZHMvZmFkMjRlOTMt/ODU4NS00NmRkLWJh/MTktZmExNDgxNDEz/OWY2XzQ1MC5qcGVn">
+  <meta property="og:title" content="Ekaidan - Learn English from Movies & Music">
+  <meta property="og:description" content="Master real English using movie scenes and songs.">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Ekaidan - gamified English learning from movies and music">
   <title>Ekaidan - Level up your real English</title>
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── STUDY MODAL ── */
+    #study-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    #study-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+    .study-box {
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      margin: 40px auto;
+      overflow: hidden;
+    }
+    .study-header {
+      background: var(--bg3);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .study-title { font-size: 16px; font-weight: 700; }
+    .study-artist { font-size: 12px; color: var(--txt2); margin-top: 2px; }
+    .study-close {
+      background: none; border: none; color: var(--txt2);
+      font-size: 22px; cursor: pointer; line-height: 1;
+    }
+    .study-close:hover { color: var(--txt); }
+
+    .study-video {
+      position: relative;
+      padding-top: 56.25%;
+      background: #000;
+    }
+    .study-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .study-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .study-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--txt3);
+      margin-bottom: 8px;
+    }
+
+    .lyrics-block {
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 2;
+      color: var(--txt);
+    }
+    .lyrics-block .lyric-line {
+      display: block;
+      padding: 2px 0;
+      border-bottom: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .lyrics-block .lyric-line:last-child { border-bottom: none; }
+    .lyrics-block .lyric-line:hover { color: var(--yellow); }
+
+    .vocab-block {
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--txt2);
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+
+    /* Quiz */
+    .quiz-block {
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .quiz-question {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .quiz-blank {
+      display: inline-block;
+      border-bottom: 2px solid var(--yellow);
+      min-width: 70px;
+      text-align: center;
+      color: var(--yellow);
+      font-weight: 700;
+      padding: 0 4px;
+      margin: 0 4px;
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .quiz-opt {
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      color: var(--txt);
+    }
+    .quiz-opt:hover { border-color: var(--blue); color: var(--blue); }
+    .quiz-opt.correct { border-color: var(--green); background: rgba(34,217,138,0.1); color: var(--green); }
+    .quiz-opt.wrong   { border-color: var(--red);   background: rgba(255,92,92,0.1);   color: var(--red); }
+    .quiz-hint {
+      font-size: 12px;
+      text-align: center;
+      color: var(--txt3);
+      min-height: 18px;
+    }
+
+    .xp-earn {
+      background: rgba(245,197,24,0.1);
+      border: 0.5px solid rgba(245,197,24,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--yellow);
+      font-weight: 700;
+      text-align: center;
+      display: none;
+    }
+    .xp-earn.show { display: block; }
+
+    /* ── PLAYER (scene video overlay) ── */
+    #scene-player {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    #scene-player.open { display: flex; }
+    .scene-player-box {
+      background: #111;
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 620px;
+      margin: 20px;
+    }
+    .scene-player-box h2 {
+      font-size: 16px;
+      margin-bottom: 14px;
+      color: var(--txt);
+    }
+    .scene-player-box iframe {
+      width: 100%;
+      height: 300px;
+      border: none;
+      border-radius: 8px;
+    }
+    .scene-player-box button {
+      margin-top: 12px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      color: var(--txt2);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
 </head>
 
 <body>
-  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Ekaidan gamified homepage — interactive English learning concept</h2>
 
-  <div id="player" style="display:none">
-  <h2 id="player-title"></h2>
-  <iframe id="player-video" width="400" height="200"></iframe>
-  <button onclick="closePlayer()">Close</button>
-</div>
-
-  <div>
-  <h2>Songs</h2>
-  <div class="songs-container"></div>
-</div>
+<!-- ── NAV ── -->
 <nav>
   <div class="logo">E<span>kaidan</span></div>
   <div style="display:flex;align-items:center;gap:10px">
@@ -38,6 +222,7 @@
   <button class="nav-btn">Play now</button>
 </nav>
 
+<!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-eyebrow"><div class="pulse"></div> 8,241 players online now</div>
   <h1>Level up your<br><span class="hl">real English</span></h1>
@@ -50,12 +235,13 @@
   </div>
 </div>
 
+<!-- ── HOT RIGHT NOW ── -->
 <div class="section">
   <div class="sec-head">
     <div class="sec-title">🔥 Hot right now</div>
     <div class="sec-link">See all →</div>
   </div>
-  <div class="scene-card-big" onclick="sendPrompt('Design the Ekaidan in-game scene player with XP rewards, combo multiplier, and pronunciation scoring')">
+  <div class="scene-card-big">
     <div class="scene-screen">
       <div class="screen-inner">
         <div class="movie-title">Spider-Man: Homecoming</div>
@@ -74,7 +260,11 @@
         <div class="sub">6 lines · "You've got to be kidding me" · Confrontation scene</div>
       </div>
       <div class="scene-meta">
-        <div class="hearts"><div class="heart"></div><div class="heart"></div><div class="heart"></div><div class="heart" style="background:var(--txt3)"></div><div class="heart" style="background:var(--txt3)"></div></div>
+        <div class="hearts">
+          <div class="heart"></div><div class="heart"></div><div class="heart"></div>
+          <div class="heart" style="background:var(--txt3)"></div>
+          <div class="heart" style="background:var(--txt3)"></div>
+        </div>
         <div class="combo-badge">x3 COMBO</div>
       </div>
     </div>
@@ -101,6 +291,15 @@
   </div>
 </div>
 
+<!-- ── PUBLISHED SCENES (from Supabase) ── -->
+<div id="dynamic-scenes-section" style="max-width:860px;margin:0 auto;padding:0 28px 48px;display:none">
+  <div class="sec-head">
+    <div class="sec-title">🎬 Published Scenes</div>
+  </div>
+  <div class="cards-3" id="dynamic-scenes-grid"></div>
+</div>
+
+<!-- ── DAILY CHALLENGE ── -->
 <div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
   <div class="sec-head">
     <div class="sec-title">⚡ Daily challenge</div>
@@ -129,6 +328,7 @@
   <div style="font-size:11px;color:var(--txt3);text-align:center;margin-top:12px" id="hint">選んでください — Choose your answer</div>
 </div>
 
+<!-- ── LEADERBOARD ── -->
 <div style="max-width:860px;margin:0 auto;padding:0 28px 16px">
   <div class="sec-head">
     <div class="sec-title">🏆 Weekly leaderboard</div>
@@ -177,6 +377,7 @@
   </div>
 </div>
 
+<!-- ── DAILY QUESTS ── -->
 <div style="max-width:860px;margin:24px auto 0;padding:0 28px">
   <div class="sec-head">
     <div class="sec-title">📅 Today's quests</div>
@@ -214,6 +415,7 @@
   </div>
 </div>
 
+<!-- ── BADGES ── -->
 <div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
   <div class="sec-head"><div class="sec-title">🏅 Your badges</div><div class="sec-link">All 34 badges →</div></div>
 </div>
@@ -239,100 +441,300 @@
   </div>
 </div>
 
+<!-- ── CTA ── -->
 <div class="cta-band">
   <h2>Ready to play?</h2>
   <p>Join 8,000+ learners. Free to start. Actually addictive.</p>
   <div class="cta-row">
-    <button class="cta-dark" onclick="sendPrompt('Design the Ekaidan battle mode where two players compete in real-time on the same movie scene')">Start playing →</button>
+    <button class="cta-dark">Start playing →</button>
     <button class="cta-ghost">Watch trailer</button>
   </div>
 </div>
 
-
+<!-- ── SONGS (from Supabase) ── -->
 <div class="section">
   <div class="sec-head">
     <div class="sec-title">🎵 Songs</div>
   </div>
-
-  <div class="songs-container"></div>
+  <div class="songs-container" id="songs-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
 </div>
 
-<div id="player" style="display:none;position:fixed;inset:0;background:#000c;z-index:999;">
-  <div style="max-width:600px;margin:80px auto;background:#111;padding:20px;border-radius:12px">
-
-    <h2 id="player-title"></h2>
-
-    <iframe id="player-video" width="100%" height="250"></iframe>
-
-    <button onclick="closePlayer()">Close</button>
-
-  </div>
-</div>
-
+<!-- ── FOOTER ── -->
 <footer>
   <div class="logo" style="font-size:15px">E<span>kaidan</span></div>
   <div>English learning for Japanese players · 日本語サポート完備</div>
   <div style="display:flex;gap:16px"><span style="cursor:pointer">Privacy</span><span style="cursor:pointer">Terms</span></div>
 </footer>
 
-<script>
-function sendPrompt(msg) {
-  console.log('Prompt:', msg);
-  // This function can be extended to handle API calls or other actions
-}
+<!-- ══════════════════════════════════
+     STUDY MODAL (songs)
+════════════════════════════════════ -->
+<div id="study-modal">
+  <div class="study-box">
+    <div class="study-header">
+      <div>
+        <div class="study-title" id="study-title">Song Title</div>
+        <div class="study-artist" id="study-artist">Artist</div>
+      </div>
+      <button class="study-close" onclick="closeStudy()">✕</button>
+    </div>
 
-document.querySelectorAll('.mode-btn').forEach(btn=>{
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    <!-- YouTube embed -->
+    <div class="study-video" id="study-video-wrap">
+      <iframe id="study-iframe" allowfullscreen allow="autoplay"></iframe>
+    </div>
+
+    <div class="study-body">
+
+      <!-- Lyrics -->
+      <div id="study-lyrics-section">
+        <div class="study-section-label">📝 Lyrics</div>
+        <div class="lyrics-block" id="study-lyrics"></div>
+      </div>
+
+      <!-- Vocab -->
+      <div id="study-vocab-section">
+        <div class="study-section-label">📖 Key Vocabulary</div>
+        <div class="vocab-block" id="study-vocab"></div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="quiz-block" id="study-quiz" style="display:none">
+        <div class="study-section-label">🧠 Fill in the Blank</div>
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-hint" id="quiz-hint">Choose your answer</div>
+      </div>
+
+      <!-- XP earned -->
+      <div class="xp-earn" id="xp-earn-banner"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCENE PLAYER
+════════════════════════════════════ -->
+<div id="scene-player">
+  <div class="scene-player-box">
+    <h2 id="scene-player-title"></h2>
+    <iframe id="scene-player-iframe" allowfullscreen></iframe>
+    <button onclick="closeScenePlayer()">✕ Close</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCRIPTS
+════════════════════════════════════ -->
+<script>
+/* ── Mode buttons ── */
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
     this.classList.add('active');
   });
 });
 
-function answer(el, result){
-  if(document.querySelector('.ch-opt.correct')||document.querySelector('.ch-opt.wrong')){return}
+/* ── Daily challenge answer ── */
+function answer(el, result) {
+  if (document.querySelector('.ch-opt.correct') || document.querySelector('.ch-opt.wrong')) return;
   el.classList.add(result);
-  const hint=document.getElementById('hint');
-  const blank=document.getElementById('blank1');
-  const xpfill=document.getElementById('xpfill');
-  const xpnum=document.getElementById('xpnum');
-  if(result==='correct'){
-    blank.textContent='shape';
-    hint.textContent='✓ 正解！ "shape" = 形 · +200 XP!';
-    hint.style.color='var(--green)';
-    let cur=62;
-    const interval=setInterval(()=>{
-      cur=Math.min(cur+2,82);
-      xpfill.style.width=cur+'%';
-      xpnum.textContent=Math.round(cur*10)+' / 1000 XP';
-      if(cur>=82)clearInterval(interval);
-    },30);
+  const hint  = document.getElementById('hint');
+  const blank = document.getElementById('blank1');
+  const xpfill = document.getElementById('xpfill');
+  const xpnum  = document.getElementById('xpnum');
+  if (result === 'correct') {
+    blank.textContent = 'shape';
+    hint.textContent  = '✓ 正解！ "shape" = 形 · +200 XP!';
+    hint.style.color  = 'var(--green)';
+    let cur = 62;
+    const iv = setInterval(() => {
+      cur = Math.min(cur + 2, 82);
+      xpfill.style.width = cur + '%';
+      xpnum.textContent  = Math.round(cur * 10) + ' / 1000 XP';
+      if (cur >= 82) clearInterval(iv);
+    }, 30);
   } else {
-    hint.textContent='✗ 不正解。 "shape" が正解 — "形"という意味。Try again!';
-    hint.style.color='var(--red)';
-    document.querySelectorAll('.ch-opt').forEach(o=>{
-      if(o.textContent.trim()==='shape')o.classList.add('correct');
+    hint.textContent = '✗ 不正解。 "shape" が正解 — "形"という意味。Try again!';
+    hint.style.color = 'var(--red)';
+    document.querySelectorAll('.ch-opt').forEach(o => {
+      if (o.textContent.trim() === 'shape') o.classList.add('correct');
     });
   }
 }
 
-let streak=14;
-setInterval(()=>{
-  const el=document.getElementById('streaknum');
-  el.style.transform='scale(1.08)';
-  setTimeout(()=>el.style.transform='scale(1)',300);
-},4000);
+/* ── Streak pulse ── */
+setInterval(() => {
+  const el = document.getElementById('streaknum');
+  el.style.transform = 'scale(1.08)';
+  setTimeout(() => el.style.transform = 'scale(1)', 300);
+}, 4000);
 
-let timerW=82;
-setInterval(()=>{
-  timerW=Math.max(timerW-0.02,0);
-  const tf=document.getElementById('tfill');
-  if(tf)tf.style.width=timerW.toFixed(1)+'%';
-},100);
+/* ── Daily challenge timer ── */
+let timerW = 82;
+setInterval(() => {
+  timerW = Math.max(timerW - 0.02, 0);
+  const tf = document.getElementById('tfill');
+  if (tf) tf.style.width = timerW.toFixed(1) + '%';
+}, 100);
 
+/* ── Scene player ── */
+function openScenePlayer(title, youtubeId) {
+  document.getElementById('scene-player-title').textContent = title;
+  document.getElementById('scene-player-iframe').src =
+    `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+  document.getElementById('scene-player').classList.add('open');
+}
+function closeScenePlayer() {
+  document.getElementById('scene-player-iframe').src = '';
+  document.getElementById('scene-player').classList.remove('open');
+}
 
+/* ── Study modal (songs) ── */
+function openStudy(song) {
+  document.getElementById('study-title').textContent  = song.title;
+  document.getElementById('study-artist').textContent = song.artist || '';
 
+  // Video
+  const iframe = document.getElementById('study-iframe');
+  if (song.youtube_id) {
+    iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1`;
+    document.getElementById('study-video-wrap').style.display = '';
+  } else {
+    iframe.src = '';
+    document.getElementById('study-video-wrap').style.display = 'none';
+  }
+
+  // Lyrics
+  const lyricsEl = document.getElementById('study-lyrics');
+  const lyricsSection = document.getElementById('study-lyrics-section');
+  const lyrics = song.lyrics || [];
+  if (lyrics.length) {
+    lyricsEl.innerHTML = lyrics.map(l =>
+      `<span class="lyric-line">${l}</span>`
+    ).join('');
+    lyricsSection.style.display = '';
+  } else {
+    lyricsSection.style.display = 'none';
+  }
+
+  // Vocab
+  const vocabEl = document.getElementById('study-vocab');
+  const vocabSection = document.getElementById('study-vocab-section');
+  if (song.vocab && song.vocab.trim()) {
+    vocabEl.textContent = song.vocab;
+    vocabSection.style.display = '';
+  } else {
+    vocabSection.style.display = 'none';
+  }
+
+  // Quiz — build from first lyric line that has 4+ words
+  buildQuiz(lyrics);
+
+  // XP banner reset
+  const banner = document.getElementById('xp-earn-banner');
+  banner.classList.remove('show');
+  banner.textContent = '';
+
+  document.getElementById('study-modal').classList.add('open');
+}
+
+function buildQuiz(lyrics) {
+  const quizEl = document.getElementById('study-quiz');
+  // Find a lyric line with enough words
+  const line = lyrics.find(l => l.split(' ').length >= 4);
+  if (!line) { quizEl.style.display = 'none'; return; }
+
+  const words = line.split(' ');
+  // Pick a content word (not the first) as the answer
+  const answerIdx = words.slice(1).findIndex(w => w.length > 3) + 1;
+  if (answerIdx <= 0) { quizEl.style.display = 'none'; return; }
+
+  const answer = words[answerIdx].replace(/[^a-zA-Z']/g, '');
+  if (!answer) { quizEl.style.display = 'none'; return; }
+
+  // Build display line with blank
+  const display = words.map((w, i) => {
+    const clean = w.replace(/[^a-zA-Z']/g, '');
+    return i === answerIdx
+      ? `<span class="quiz-blank" id="quiz-blank">_____</span>`
+      : w;
+  }).join(' ');
+
+  document.getElementById('quiz-question').innerHTML = `"${display}"`;
+
+  // Generate wrong options (shuffled nearby letters)
+  const distractors = generateDistractors(answer);
+  const allOptions = shuffle([answer, ...distractors]);
+
+  const optionsEl = document.getElementById('quiz-options');
+  optionsEl.innerHTML = '';
+  allOptions.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => handleQuizAnswer(btn, opt, answer, optionsEl);
+    optionsEl.appendChild(btn);
+  });
+
+  document.getElementById('quiz-hint').textContent = 'Choose your answer';
+  document.getElementById('quiz-hint').style.color = 'var(--txt3)';
+  quizEl.style.display = '';
+}
+
+function handleQuizAnswer(btn, chosen, correct, optionsEl) {
+  // Prevent double answering
+  if (optionsEl.querySelector('.correct') || optionsEl.querySelector('.wrong')) return;
+
+  const hint   = document.getElementById('quiz-hint');
+  const blank  = document.getElementById('quiz-blank');
+  const banner = document.getElementById('xp-earn-banner');
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    if (blank) blank.textContent = correct;
+    hint.textContent  = '✓ 正解！ Correct!';
+    hint.style.color  = 'var(--green)';
+    banner.textContent = '🎉 +XP earned! Great work!';
+    banner.classList.add('show');
+  } else {
+    btn.classList.add('wrong');
+    hint.textContent = `✗ 不正解。 The answer was "${correct}"`;
+    hint.style.color = 'var(--red)';
+    // Highlight correct
+    optionsEl.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.textContent === correct) o.classList.add('correct');
+    });
+  }
+}
+
+function generateDistractors(word) {
+  // Simple: common English words as fillers
+  const pool = ['the','and','you','love','know','feel','time','make','come','going','never','always','every','heart','night'];
+  return shuffle(pool.filter(w => w !== word.toLowerCase())).slice(0, 3);
+}
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function closeStudy() {
+  document.getElementById('study-iframe').src = '';
+  document.getElementById('study-modal').classList.remove('open');
+}
+
+// Close modals on backdrop click
+document.getElementById('study-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStudy();
+});
+document.getElementById('scene-player').addEventListener('click', function(e) {
+  if (e.target === this) closeScenePlayer();
+});
 </script>
+
 <script src="site.js"></script>
 <script src="main-integrated.js"></script>
+
 </body>
 </html>
