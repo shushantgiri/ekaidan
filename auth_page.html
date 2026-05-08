@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ekaidan — Sign In</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); }
+
+    .auth-wrap {
+      width: 100%; max-width: 420px; padding: 20px;
+    }
+
+    .auth-logo {
+      text-align: center; margin-bottom: 28px;
+    }
+    .auth-logo .logo { font-size: 28px; font-weight: 900; }
+    .auth-logo p { font-size: 13px; color: var(--txt2); margin-top: 6px; }
+
+    .auth-box {
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .auth-tab {
+      flex: 1; padding: 14px; text-align: center;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      color: var(--txt2); transition: all 0.15s;
+      background: none; border: none; font-family: 'Space Grotesk', sans-serif;
+    }
+    .auth-tab.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); background: rgba(245,197,24,0.04); }
+
+    .auth-form { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+
+    .auth-field { display: flex; flex-direction: column; gap: 5px; }
+    .auth-field label { font-size: 11px; color: var(--txt2); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .auth-field input {
+      background: var(--bg3); border: 0.5px solid var(--border2);
+      border-radius: 8px; padding: 11px 14px;
+      font-size: 14px; color: var(--txt); font-family: 'Space Grotesk', sans-serif;
+      outline: none; transition: border-color 0.2s; width: 100%;
+    }
+    .auth-field input:focus { border-color: var(--yellow); }
+    .auth-field input::placeholder { color: var(--txt3); }
+
+    .auth-hint { font-size: 11px; color: var(--txt3); }
+
+    .auth-btn {
+      background: var(--yellow); color: #000;
+      border: none; border-radius: 10px; padding: 13px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      transition: all 0.15s; margin-top: 4px;
+    }
+    .auth-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .auth-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 11px; color: var(--txt3);
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; flex: 1; height: 0.5px; background: var(--border2);
+    }
+
+    .auth-error {
+      background: rgba(255,92,92,0.1); border: 0.5px solid rgba(255,92,92,0.3);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; color: var(--red); display: none;
+    }
+    .auth-error.show { display: block; }
+
+    .auth-success {
+      background: rgba(34,217,138,0.1); border: 0.5px solid rgba(34,217,138,0.3);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; color: var(--green); display: none; text-align: center;
+    }
+    .auth-success.show { display: block; }
+
+    .auth-footer { text-align: center; padding: 0 24px 20px; font-size: 12px; color: var(--txt3); }
+    .auth-footer a { color: var(--blue); cursor: pointer; text-decoration: none; }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 42px; }
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--txt3); cursor: pointer;
+      font-size: 16px; padding: 0; line-height: 1;
+    }
+    .pw-toggle:hover { color: var(--txt2); }
+
+    .username-check {
+      font-size: 11px; margin-top: 3px; min-height: 14px;
+    }
+    .username-check.ok { color: var(--green); }
+    .username-check.taken { color: var(--red); }
+
+    .strength-bar { height: 3px; border-radius: 2px; margin-top: 5px; background: var(--bg3); overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--txt2); cursor: pointer;
+      margin-bottom: 18px; text-decoration: none;
+    }
+    .back-link:hover { color: var(--txt); }
+  </style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <a class="back-link" href="index.html">← Back to Ekaidan</a>
+
+  <div class="auth-logo">
+    <div class="logo">E<span>kaidan</span></div>
+    <p>Master real English through movies &amp; music</p>
+  </div>
+
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="form-signin" class="auth-form">
+      <div class="auth-error" id="signin-error"></div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="signin-password" placeholder="Your password" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePw('signin-password', this)" type="button">👁</button>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <a href="#" onclick="showReset()" style="font-size:12px;color:var(--blue);text-decoration:none">Forgot password?</a>
+      </div>
+      <button class="auth-btn" id="signin-btn" onclick="doSignIn()">Sign In →</button>
+      <div class="auth-success" id="signin-success"></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="form-signup" class="auth-form" style="display:none">
+      <div class="auth-error" id="signup-error"></div>
+      <div class="auth-field">
+        <label>Username <span style="color:var(--txt3);font-weight:400">(shown on leaderboard)</span></label>
+        <input type="text" id="signup-username" placeholder="e.g. Yuki_Kaze" maxlength="20"
+               oninput="checkUsername(this.value)" autocomplete="username">
+        <div class="username-check" id="username-check"></div>
+      </div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="signup-password" placeholder="Min 8 characters"
+                 oninput="checkStrength(this.value)" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('signup-password', this)" type="button">👁</button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        <div class="auth-hint" id="strength-label"></div>
+      </div>
+      <button class="auth-btn" id="signup-btn" onclick="doSignUp()">Create Account →</button>
+      <div class="auth-success" id="signup-success"></div>
+    </div>
+
+    <!-- PASSWORD RESET -->
+    <div id="form-reset" class="auth-form" style="display:none">
+      <div style="font-size:14px;color:var(--txt2);text-align:center;margin-bottom:4px">Enter your email to reset your password.</div>
+      <div class="auth-error" id="reset-error"></div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="reset-email" placeholder="you@example.com">
+      </div>
+      <button class="auth-btn" onclick="doReset()">Send Reset Link →</button>
+      <div class="auth-success" id="reset-success"></div>
+      <div style="text-align:center"><a href="#" onclick="switchTab('signin')" style="font-size:12px;color:var(--txt2)">← Back to sign in</a></div>
+    </div>
+  </div>
+
+  <div class="auth-footer">
+    By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  ['signin','signup'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`form-${t}`).style.display = t === tab ? 'flex' : 'none';
+  });
+  document.getElementById('form-reset').style.display = 'none';
+  clearErrors();
+}
+
+function showReset() {
+  ['signin','signup'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.remove('active');
+    document.getElementById(`form-${t}`).style.display = 'none';
+  });
+  document.getElementById('form-reset').style.display = 'flex';
+}
+
+function clearErrors() {
+  document.querySelectorAll('.auth-error, .auth-success').forEach(el => {
+    el.classList.remove('show'); el.textContent = '';
+  });
+}
+
+/* ── PASSWORD TOGGLE ── */
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+/* ── PASSWORD STRENGTH ── */
+function checkStrength(pw) {
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors = ['#ff5c5c','#ff8c3a','#f5c518','#22d98a'];
+  const labels = ['Too short','Weak','Good','Strong 💪'];
+  fill.style.width  = score ? (score * 25) + '%' : '0';
+  fill.style.background = colors[score - 1] || 'transparent';
+  label.textContent = pw.length ? labels[score - 1] || '' : '';
+  label.style.color = colors[score - 1] || 'var(--txt3)';
+}
+
+/* ── USERNAME CHECK ── */
+let usernameTimer;
+async function checkUsername(val) {
+  const el = document.getElementById('username-check');
+  clearTimeout(usernameTimer);
+  val = val.trim();
+  if (!val) { el.textContent = ''; return; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
+    el.textContent = 'Letters, numbers and _ only, 3–20 chars'; el.className = 'username-check taken'; return;
+  }
+  el.textContent = 'Checking…'; el.className = 'username-check';
+  usernameTimer = setTimeout(async () => {
+    try {
+      const rows = await DB.getUserByUsername(val);
+      if (rows && rows.length > 0) {
+        el.textContent = '✗ Username taken'; el.className = 'username-check taken';
+      } else {
+        el.textContent = '✓ Available!'; el.className = 'username-check ok';
+      }
+    } catch { el.textContent = ''; }
+  }, 500);
+}
+
+/* ── SIGN IN ── */
+async function doSignIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const pw    = document.getElementById('signin-password').value;
+  const errEl = document.getElementById('signin-error');
+  const btn   = document.getElementById('signin-btn');
+
+  if (!email || !pw) { showErr(errEl, 'Please fill in all fields.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const data = await AUTH.signIn(email, pw);
+    if (data.error) { showErr(errEl, friendlyError(data.error.message)); return; }
+
+    // Save session
+    sessionStorage.setItem('ekaidan_session', JSON.stringify(data.session));
+    sessionStorage.setItem('ekaidan_user', JSON.stringify(data.user));
+
+    // Load profile then redirect
+    const profile = await DB.getProfile(data.user.id);
+    if (profile) sessionStorage.setItem('ekaidan_profile', JSON.stringify(profile));
+
+    const redirect = sessionStorage.getItem('auth_redirect') || 'index.html';
+    sessionStorage.removeItem('auth_redirect');
+    window.location.href = redirect;
+  } catch(e) {
+    showErr(errEl, 'Something went wrong. Try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+
+/* ── SIGN UP ── */
+async function doSignUp() {
+  const username = document.getElementById('signup-username').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const pw       = document.getElementById('signup-password').value;
+  const errEl    = document.getElementById('signup-error');
+  const sucEl    = document.getElementById('signup-success');
+  const btn      = document.getElementById('signup-btn');
+  const checkEl  = document.getElementById('username-check');
+
+  if (!username || !email || !pw) { showErr(errEl, 'Please fill in all fields.'); return; }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showErr(errEl, 'Invalid username format.'); return; }
+  if (pw.length < 8) { showErr(errEl, 'Password must be at least 8 characters.'); return; }
+  if (checkEl.classList.contains('taken')) { showErr(errEl, 'Please choose a different username.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  try {
+    const data = await AUTH.signUp(email, pw);
+    if (data.error) { showErr(errEl, friendlyError(data.error.message)); return; }
+
+    // Insert profile row
+    if (data.user) {
+      await DB.insertProfile({ id: data.user.id, username, xp: 0, level: 1, streak: 0 });
+    }
+
+    sucEl.textContent = '🎉 Account created! Check your email to confirm, then sign in.';
+    sucEl.classList.add('show');
+    errEl.classList.remove('show');
+
+    setTimeout(() => switchTab('signin'), 3000);
+  } catch(e) {
+    showErr(errEl, 'Something went wrong. Try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create Account →';
+  }
+}
+
+/* ── RESET ── */
+async function doReset() {
+  const email = document.getElementById('reset-email').value.trim();
+  const errEl = document.getElementById('reset-error');
+  const sucEl = document.getElementById('reset-success');
+  if (!email) { showErr(errEl, 'Please enter your email.'); return; }
+  try {
+    await AUTH.resetPassword(email);
+    sucEl.textContent = '✓ Reset link sent! Check your inbox.';
+    sucEl.classList.add('show');
+    errEl.classList.remove('show');
+  } catch(e) {
+    showErr(errEl, 'Could not send reset link. Check your email.');
+  }
+}
+
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+function friendlyError(msg) {
+  if (msg.includes('Invalid login')) return 'Incorrect email or password.';
+  if (msg.includes('already registered')) return 'This email is already registered.';
+  if (msg.includes('not confirmed')) return 'Please confirm your email first.';
+  return msg;
+}
+
+/* ── AUTO-FILL TAB FROM URL ── */
+const params = new URLSearchParams(location.search);
+if (params.get('tab') === 'signup') switchTab('signup');
+
+/* ── ALREADY LOGGED IN? ── */
+if (AUTH.currentUser()) {
+  window.location.href = sessionStorage.getItem('auth_redirect') || 'index.html';
+}
+</script>
+</body>
+</html>

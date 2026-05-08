@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ekaidan — Music Library</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .lib-header {
+      padding: 28px 28px 0;
+      max-width: 960px; margin: 0 auto;
+    }
+    .lib-title { font-size: 28px; font-weight: 900; letter-spacing: -1px; margin-bottom: 6px; }
+    .lib-sub { font-size: 14px; color: var(--txt2); margin-bottom: 24px; }
+
+    .lib-filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .filter-chip {
+      padding: 7px 16px; border-radius: 100px;
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      font-size: 13px; font-weight: 600; cursor: pointer; color: var(--txt2);
+      transition: all 0.15s;
+    }
+    .filter-chip.active, .filter-chip:hover { background: var(--yellow); color: #000; border-color: var(--yellow); }
+
+    .lib-search {
+      position: relative; max-width: 320px; margin-bottom: 28px;
+    }
+    .lib-search input {
+      width: 100%; padding: 10px 14px 10px 36px;
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: 100px; font-size: 13px; color: var(--txt);
+      outline: none; transition: border-color 0.2s;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .lib-search input:focus { border-color: var(--yellow); }
+    .lib-search input::placeholder { color: var(--txt3); }
+    .lib-search::before {
+      content: '🔍'; position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); font-size: 13px; pointer-events: none;
+    }
+
+    .songs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 0 28px 48px; max-width: 960px; margin: 0 auto;
+    }
+
+    .song-card {
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .song-card:hover { border-color: rgba(245,197,24,0.5); transform: translateY(-3px); }
+
+    .song-thumb {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      background: var(--bg3);
+    }
+    .song-thumb-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--bg3); display: flex; align-items: center;
+      justify-content: center; font-size: 36px;
+    }
+
+    .song-info { padding: 12px; }
+    .song-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-artist { font-size: 12px; color: var(--txt2); margin-bottom: 8px; }
+    .song-meta { display: flex; align-items: center; justify-content: space-between; }
+    .song-diff {
+      font-size: 10px; font-weight: 700; padding: 3px 8px;
+      border-radius: 100px;
+    }
+    .diff-beginner { background: rgba(34,217,138,0.15); color: var(--green); }
+    .diff-intermediate { background: rgba(245,197,24,0.15); color: var(--yellow); }
+    .diff-advanced { background: rgba(255,92,92,0.15); color: var(--red); }
+    .song-xp { font-size: 11px; color: var(--yellow); font-weight: 700; }
+
+    .empty-msg {
+      grid-column: 1 / -1; text-align: center;
+      padding: 48px; color: var(--txt3); font-size: 14px;
+    }
+
+    /* User bar */
+    .user-bar {
+      background: var(--bg2); border-bottom: 0.5px solid var(--border);
+      padding: 10px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 100%;
+    }
+    .user-bar-left { display: flex; align-items: center; gap: 12px; }
+    .user-bar-xp {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg3); padding: 6px 12px; border-radius: 100px;
+      border: 0.5px solid var(--border2);
+    }
+    .xp-track-sm { width: 80px; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+    .xp-fill-sm { height: 100%; background: var(--yellow); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="index.html" style="text-decoration:none;color:inherit">E<span>kaidan</span></a></div>
+  <div id="user-bar-nav" style="display:flex;align-items:center;gap:10px">
+    <!-- filled by JS -->
+  </div>
+  <a href="index.html" style="text-decoration:none"><button class="nav-btn">← Home</button></a>
+</nav>
+
+<div class="lib-header">
+  <h1 class="lib-title">🎵 Music Library</h1>
+  <p class="lib-sub" id="lib-sub">All songs available for study</p>
+
+  <div class="lib-filters">
+    <div class="filter-chip active" data-filter="">All</div>
+    <div class="filter-chip" data-filter="Beginner">Beginner</div>
+    <div class="filter-chip" data-filter="Intermediate">Intermediate</div>
+    <div class="filter-chip" data-filter="Advanced">Advanced</div>
+  </div>
+
+  <div class="lib-search">
+    <input type="text" id="lib-search-input" placeholder="Search songs or artists…" oninput="filterSongs()">
+  </div>
+</div>
+
+<div class="songs-grid" id="songs-grid">
+  <div class="empty-msg">Loading songs…</div>
+</div>
+
+<!-- Study modal (same as index.html) -->
+<div id="study-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto;padding:20px">
+  <div class="study-box" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;width:100%;max-width:580px;margin:40px auto;overflow:hidden">
+    <div style="background:var(--bg3);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)">
+      <div>
+        <div style="font-size:16px;font-weight:700" id="study-title"></div>
+        <div style="font-size:12px;color:var(--txt2);margin-top:2px" id="study-artist"></div>
+      </div>
+      <button onclick="closeStudy()" style="background:none;border:none;color:var(--txt2);font-size:22px;cursor:pointer">✕</button>
+    </div>
+    <div style="position:relative;padding-top:56.25%;background:#000" id="study-video-wrap">
+      <iframe id="study-iframe" style="position:absolute;inset:0;width:100%;height:100%;border:none" allowfullscreen></iframe>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+      <div id="study-lyrics-section">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-bottom:8px">📝 Lyrics</div>
+        <div id="study-lyrics" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:14px 16px;font-size:14px;line-height:2"></div>
+      </div>
+      <div id="study-vocab-section">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-bottom:8px">📖 Key Vocabulary</div>
+        <div id="study-vocab" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--txt2);white-space:pre-line"></div>
+      </div>
+      <div id="study-quiz" style="display:none;background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;padding:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-bottom:12px">🧠 Fill in the Blank</div>
+        <div id="quiz-question" style="font-size:16px;font-weight:700;text-align:center;margin-bottom:16px;line-height:1.6"></div>
+        <div id="quiz-options" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
+        <div id="quiz-hint" style="font-size:12px;text-align:center;color:var(--txt3)">Choose your answer</div>
+      </div>
+      <div id="xp-earn-banner" style="display:none;background:rgba(245,197,24,0.1);border:0.5px solid rgba(245,197,24,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--yellow);font-weight:700;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+// ── AUTH GUARD ──
+if (!AUTH.requireAuth('music.html')) { /* redirected */ }
+
+// ── LOAD USER ──
+const profile = AUTH.currentProfile();
+if (profile) {
+  const nav = document.getElementById('user-bar-nav');
+  nav.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);padding:6px 12px;border-radius:100px;border:0.5px solid var(--border2)">
+      <span style="font-size:12px;color:var(--yellow);font-weight:700">Lv ${profile.level||1}</span>
+      <div style="width:60px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden">
+        <div style="width:${Math.min(((profile.xp||0)%500)/5,100)}%;height:100%;background:var(--yellow);border-radius:2px"></div>
+      </div>
+      <span style="font-size:11px;color:var(--txt2)">${(profile.xp||0).toLocaleString()} XP</span>
+    </div>
+    <span style="font-size:13px;font-weight:700;color:var(--txt)">${profile.username}</span>`;
+  document.getElementById('lib-sub').textContent =
+    `Welcome back, ${profile.username}! ${songs ? songs.length : ''} songs ready to study.`;
+}
+
+// ── ALL SONGS ──
+let songs = [];
+let activeFilter = '';
+
+async function loadSongs() {
+  const grid = document.getElementById('songs-grid');
+  try {
+    const all = await DB.getSongs();
+    songs = all.filter(s => s.status === 'Live' || !s.status);
+    renderGrid();
+  } catch(e) {
+    grid.innerHTML = '<div class="empty-msg">Could not load songs. Please try again.</div>';
+  }
+}
+
+function renderGrid() {
+  const grid = document.getElementById('songs-grid');
+  const q    = document.getElementById('lib-search-input').value.toLowerCase().trim();
+
+  const filtered = songs.filter(s => {
+    const matchLevel  = !activeFilter || (s.difficulty || s.level || '') === activeFilter;
+    const matchSearch = !q || s.title.toLowerCase().includes(q) || (s.artist||'').toLowerCase().includes(q);
+    return matchLevel && matchSearch;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-msg">No songs found. Try a different filter.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  filtered.forEach(song => {
+    const level = song.difficulty || song.level || '';
+    const diffClass = level === 'Beginner' ? 'diff-beginner' :
+                      level === 'Intermediate' ? 'diff-intermediate' : 'diff-advanced';
+    const thumb = song.youtube_id
+      ? `<img class="song-thumb" src="https://img.youtube.com/vi/${song.youtube_id}/mqdefault.jpg" loading="lazy">`
+      : `<div class="song-thumb-placeholder">🎵</div>`;
+
+    const card = document.createElement('div');
+    card.className = 'song-card';
+    card.innerHTML = `
+      ${thumb}
+      <div class="song-info">
+        <div class="song-title">${song.title}</div>
+        <div class="song-artist">${song.artist || '—'}</div>
+        <div class="song-meta">
+          <span class="song-diff ${diffClass}">${level || 'Any'}</span>
+          <span class="song-xp">+${song.xp || 0} XP</span>
+        </div>
+      </div>`;
+    card.onclick = () => openStudy(song);
+    grid.appendChild(card);
+  });
+}
+
+function filterSongs() { renderGrid(); }
+
+// Filter chips
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    activeFilter = this.dataset.filter;
+    renderGrid();
+  });
+});
+
+// ── STUDY MODAL ──
+function openStudy(song) {
+  document.getElementById('study-title').textContent  = song.title;
+  document.getElementById('study-artist').textContent = song.artist || '';
+  const iframe = document.getElementById('study-iframe');
+  if (song.youtube_id) {
+    iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1`;
+    document.getElementById('study-video-wrap').style.display = '';
+  } else {
+    iframe.src = '';
+    document.getElementById('study-video-wrap').style.display = 'none';
+  }
+  const lyrics = song.lyrics || [];
+  const lyricsEl = document.getElementById('study-lyrics');
+  if (lyrics.length) {
+    lyricsEl.innerHTML = lyrics.map(l => `<span style="display:block;padding:2px 0;border-bottom:0.5px solid var(--border);cursor:pointer" onmouseover="this.style.color='var(--yellow)'" onmouseout="this.style.color=''">${l}</span>`).join('');
+    document.getElementById('study-lyrics-section').style.display = '';
+  } else {
+    document.getElementById('study-lyrics-section').style.display = 'none';
+  }
+  const vocab = song.vocab || song.vocabulary || '';
+  if (vocab) {
+    document.getElementById('study-vocab').textContent = vocab;
+    document.getElementById('study-vocab-section').style.display = '';
+  } else {
+    document.getElementById('study-vocab-section').style.display = 'none';
+  }
+  buildQuiz(lyrics);
+  document.getElementById('xp-earn-banner').style.display = 'none';
+  document.getElementById('study-modal').style.display = 'flex';
+  document.getElementById('study-modal').style.alignItems = 'flex-start';
+  document.getElementById('study-modal').style.justifyContent = 'center';
+}
+
+function buildQuiz(lyrics) {
+  const quizEl = document.getElementById('study-quiz');
+  const line = lyrics.find(l => l.split(' ').length >= 4);
+  if (!line) { quizEl.style.display = 'none'; return; }
+  const words = line.split(' ');
+  const answerIdx = words.slice(1).findIndex(w => w.length > 3) + 1;
+  if (answerIdx <= 0) { quizEl.style.display = 'none'; return; }
+  const answer = words[answerIdx].replace(/[^a-zA-Z']/g, '');
+  if (!answer) { quizEl.style.display = 'none'; return; }
+  const display = words.map((w, i) => i === answerIdx
+    ? `<span style="display:inline-block;border-bottom:2px solid var(--yellow);min-width:70px;text-align:center;color:var(--yellow);font-weight:700;padding:0 4px;margin:0 4px" id="quiz-blank">_____</span>`
+    : w).join(' ');
+  document.getElementById('quiz-question').innerHTML = `"${display}"`;
+  const pool = ['the','and','you','love','know','feel','time','make','come','going','never','always','every','heart','night'];
+  const distractors = [...pool].sort(() => Math.random() - 0.5).filter(w => w !== answer.toLowerCase()).slice(0, 3);
+  const opts = [answer, ...distractors].sort(() => Math.random() - 0.5);
+  const optionsEl = document.getElementById('quiz-options');
+  optionsEl.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.style.cssText = 'background:var(--bg2);border:0.5px solid var(--border2);padding:10px 14px;border-radius:8px;font-size:14px;cursor:pointer;text-align:center;color:var(--txt);transition:all 0.15s';
+    btn.textContent = opt;
+    btn.onmouseover = () => { if (!btn.dataset.answered) btn.style.borderColor = 'var(--blue)'; };
+    btn.onmouseout  = () => { if (!btn.dataset.answered) btn.style.borderColor = 'var(--border2)'; };
+    btn.onclick = () => {
+      if (document.querySelector('[data-answered]')) return;
+      btn.dataset.answered = '1';
+      const hint = document.getElementById('quiz-hint');
+      const blank = document.getElementById('quiz-blank');
+      if (opt === answer) {
+        btn.style.cssText += ';border-color:var(--green);background:rgba(34,217,138,0.1);color:var(--green)';
+        if (blank) blank.textContent = answer;
+        hint.textContent = '✓ 正解！ Correct!'; hint.style.color = 'var(--green)';
+        const banner = document.getElementById('xp-earn-banner');
+        banner.textContent = '🎉 +XP earned!'; banner.style.display = 'block';
+        // Award XP
+        const user = AUTH.currentUser();
+        if (user) DB.awardXP(user.id, 10).catch(()=>{});
+      } else {
+        btn.style.cssText += ';border-color:var(--red);background:rgba(255,92,92,0.1);color:var(--red)';
+        hint.textContent = `✗ The answer was "${answer}"`; hint.style.color = 'var(--red)';
+        optionsEl.querySelectorAll('div').forEach(o => {
+          if (o.textContent === answer) o.style.cssText += ';border-color:var(--green);background:rgba(34,217,138,0.1);color:var(--green)';
+        });
+      }
+    };
+    optionsEl.appendChild(btn);
+  });
+  quizEl.style.display = '';
+}
+
+function closeStudy() {
+  document.getElementById('study-iframe').src = '';
+  document.getElementById('study-modal').style.display = 'none';
+}
+document.getElementById('study-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStudy();
+});
+
+loadSongs();
+</script>
+</body>
+</html>
