@@ -1,5 +1,5 @@
 // =====================================================
-// EKAIDAN — main-integrated.js  (v3)
+// EKAIDAN — main_integrated_final.js  (v4)
 // Runs on index.html — loads live content from Supabase
 // =====================================================
 
@@ -9,14 +9,11 @@
    ─────────────────────────────────────────────────── */
 function requireLoginFor(action, callback) {
   if (AUTH.isLoggedIn()) { callback(); return; }
-  // Save intent so we can deep-link after login
   sessionStorage.setItem('auth_redirect', location.pathname + '#' + action);
-  // Show a brief inline nudge then redirect
   showLoginNudge(() => { window.location.href = 'auth_page.html'; });
 }
 
 function showLoginNudge(onConfirm) {
-  // Remove any existing nudge
   document.getElementById('login-nudge')?.remove();
   const nudge = document.createElement('div');
   nudge.id = 'login-nudge';
@@ -42,9 +39,8 @@ function showLoginNudge(onConfirm) {
   nudge.querySelector('.nudge-close').style.cssText =
     'background:none;border:none;color:var(--txt3);font-size:18px;cursor:pointer;line-height:1;flex-shrink:0';
   document.body.appendChild(nudge);
-  nudge.querySelector('#nudge-go').onclick    = () => { nudge.remove(); onConfirm(); };
+  nudge.querySelector('#nudge-go').onclick = () => { nudge.remove(); onConfirm(); };
   nudge.querySelector('#nudge-close').onclick = () => nudge.remove();
-  // Auto-dismiss after 8 s
   setTimeout(() => nudge.remove(), 8000);
 }
 
@@ -56,14 +52,12 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     this.classList.add('active');
 
     if (id === 'm2') {
-      // Music Mode → Music Library (auth required)
       requireLoginFor('music', () => { window.location.href = 'music_library.html'; });
     } else if (id === 'm3') {
       requireLoginFor('speed', () => showComingSoon('Speed Round'));
     } else if (id === 'm4') {
       requireLoginFor('battle', () => showComingSoon('Battle Mode'));
     }
-    // m1 (Movie Mode) stays on page — cards below are clickable
   });
 });
 
@@ -96,8 +90,15 @@ document.querySelector('.sec-link')?.addEventListener('click', () => {
 document.querySelectorAll('.sec-link').forEach(el => {
   if (el.textContent.includes('league')) {
     el.addEventListener('click', () => {
-      requireLoginFor('leaderboard', () => showComingSoon('Full Leaderboard'));
+      requireLoginFor('leaderboard', () => openLeaderboardModal());
     });
+  }
+});
+
+/* ── BADGES "All 34 badges" ─────────────────────── */
+document.querySelectorAll('.sec-link').forEach(el => {
+  if (el.textContent.includes('badges')) {
+    el.addEventListener('click', () => openBadgesModal());
   }
 });
 
@@ -121,7 +122,7 @@ async function loadDynamicScenes() {
     if (!scenes.length) return;
 
     const section = document.getElementById('dynamic-scenes-section');
-    const grid    = document.getElementById('dynamic-scenes-grid');
+    const grid = document.getElementById('dynamic-scenes-grid');
     if (!section || !grid) return;
 
     grid.innerHTML = '';
@@ -149,35 +150,108 @@ async function loadDynamicScenes() {
 }
 
 /* ── LOAD LIVE SONGS FROM SUPABASE ──────────────── */
+let _allSongs = []; // cache so the modal can use them without a second fetch
+
 async function loadDynamicSongs() {
   try {
     const songs = await DB.getLiveSongs();
+    _allSongs = songs;
     if (!songs.length) return;
 
     const grid = document.getElementById('songs-grid');
     if (!grid) return;
 
+    // Render only the first 3 cards on the page
     grid.innerHTML = '';
-    songs.slice(0, 6).forEach(song => {
-      const card = document.createElement('div');
-      card.className = 'mini-card';
-      card.innerHTML = `
-        <div class="mc-icon">🎵</div>
-        <div class="mc-title">${song.title}</div>
-        <div class="mc-sub">${song.artist || ''}</div>
-        <div class="mc-xp">+${song.xp || 0} XP</div>`;
-      card.addEventListener('click', () => {
-        requireLoginFor('song', () => {
-          // If on index page, open study modal inline; otherwise go to library
-          if (typeof openStudy === 'function') openStudy(song);
-          else window.location.href = 'music_library.html';
-        });
-      });
-      grid.appendChild(card);
+    songs.slice(0, 3).forEach(song => {
+      grid.appendChild(buildSongMiniCard(song));
     });
+
+    // Inject "See more" button below the grid (only if there are more than 3 songs)
+    const songsSection = grid.closest('.section') || grid.parentElement;
+    let seeMoreWrap = document.getElementById('songs-see-more');
+
+    if (!seeMoreWrap) {
+      seeMoreWrap = document.createElement('div');
+      seeMoreWrap.id = 'songs-see-more';
+      seeMoreWrap.className = 'songs-see-more';
+      songsSection.appendChild(seeMoreWrap);
+    }
+
+    if (songs.length > 3) {
+      const remaining = songs.length - 3;
+      seeMoreWrap.innerHTML = `
+        <button class="see-more-btn" onclick="openSongsModal()">
+          🎵 See all songs
+          <span class="btn-count">+${remaining} more</span>
+        </button>`;
+      seeMoreWrap.style.display = '';
+    } else {
+      seeMoreWrap.style.display = 'none';
+    }
+
   } catch (e) {
     console.warn('Could not load songs:', e);
   }
+}
+
+// Builds a small card for the homepage grid (mini-card style)
+function buildSongMiniCard(song) {
+  const card = document.createElement('div');
+  card.className = 'mini-card';
+  card.innerHTML = `
+    <div class="mc-icon">🎵</div>
+    <div class="mc-title">${song.title}</div>
+    <div class="mc-sub">${song.artist || ''}</div>
+    <div class="mc-xp">+${song.xp || 0} XP</div>`;
+  card.addEventListener('click', () => {
+    requireLoginFor('song', () => {
+      if (typeof openStudy === 'function') openStudy(song);
+      else window.location.href = 'music_library.html';
+    });
+  });
+  return card;
+}
+
+// ── SONGS MODAL ──────────────────────────────────
+function openSongsModal() {
+  const grid = document.getElementById('songs-modal-grid');
+  const count = document.getElementById('songs-modal-count');
+  if (!grid) return;
+
+  // Update count badge
+  count.textContent = _allSongs.length;
+
+  // Build all song cards in the modal
+  grid.innerHTML = '';
+  _allSongs.forEach(song => {
+    const card = document.createElement('div');
+    card.className = 'songs-modal-card';
+    card.innerHTML = `
+      <div class="smc-icon">🎵</div>
+      <div class="smc-info">
+        <div class="smc-title">${song.title}</div>
+        <div class="smc-artist">${song.artist || 'Unknown artist'}</div>
+        <div class="smc-xp">+${song.xp || 0} XP</div>
+      </div>
+      <div class="smc-play">▶</div>`;
+    card.addEventListener('click', () => {
+      closeSongsModal();
+      requireLoginFor('song', () => {
+        if (typeof openStudy === 'function') openStudy(song);
+        else window.location.href = 'music_library.html';
+      });
+    });
+    grid.appendChild(card);
+  });
+
+  document.getElementById('songs-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSongsModal() {
+  document.getElementById('songs-modal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 /* ── LOAD LIVE LEADERBOARD ───────────────────────── */
@@ -189,25 +263,23 @@ async function loadLeaderboard() {
     const container = document.querySelector('.leaderboard');
     if (!container) return;
 
-    // Keep the head, replace the rows
-    const rows = container.querySelectorAll('.lb-row');
-    rows.forEach(r => r.remove());
+    container.querySelectorAll('.lb-row').forEach(r => r.remove());
 
-    const rankStyles = ['gold','silver',''];
+    const rankStyles = ['gold', 'silver', ''];
     const currentUser = AUTH.currentProfile();
 
     players.forEach((p, i) => {
       const isMe = currentUser && p.username === currentUser.username;
-      const row  = document.createElement('div');
+      const row = document.createElement('div');
       row.className = 'lb-row' + (isMe ? ' me' : '');
       row.innerHTML = `
         <div class="lb-rank ${rankStyles[i] || ''}">${i + 1}</div>
         <div class="lb-avatar" style="background:rgba(245,197,24,0.12);color:var(--yellow)">
-          ${p.username.slice(0,2).toUpperCase()}
+          ${p.username.slice(0, 2).toUpperCase()}
         </div>
         <div class="lb-name">${p.username}${isMe ? ' <span class="lb-you">★ me</span>' : ''}</div>
-        <div class="lb-score">${(p.xp||0).toLocaleString()} XP</div>
-        <div class="lb-streak">🔥 ${p.streak||0}</div>`;
+        <div class="lb-score">${(p.xp || 0).toLocaleString()} XP</div>
+        <div class="lb-streak">🔥 ${p.streak || 0}</div>`;
       container.appendChild(row);
     });
   } catch (e) {
@@ -218,17 +290,86 @@ async function loadLeaderboard() {
 /* ── LOAD DAILY CHALLENGE ────────────────────────── */
 async function loadDailyChallenge() {
   try {
-    const all = await DB.getChallenges();
-    if (!all.length) return;
+    let challenges = await DB.getChallenges();
+    if (!challenges.length) {
+      challenges = [
+        {
+          id: 1,
+          type: 'lyrics',
+          source: 'Shape of You — Ed Sheeran',
+          sentence: "The shape of your body in the sound",
+          answer: 'shape',
+          distractors: ['movement', 'rhythm', 'sound'],
+          translation: '意味: あなたの体の形が音の中に',
+          explanation: 'shape = 形'
+        },
+        {
+          id: 2,
+          type: 'conversation',
+          source: 'Native Conversation — Coffee Shop',
+          sentence: "Hey, can I get a latte with almond milk? And make it extra hot.",
+          answer: 'latte',
+          distractors: ['coffee', 'tea', 'juice'],
+          translation: '意味: ヘイ、アーモンドミルクのラテをもらえる？ そしてすごく熱くして。',
+          explanation: 'latte = ラテ (カフェラテ)'
+        },
+        {
+          id: 3,
+          type: 'scene',
+          source: 'Spider-Man: Homecoming',
+          sentence: "You've got to be kidding me",
+          answer: 'kidding',
+          distractors: ['serious', 'lying', 'joking'],
+          translation: '意味: 冗談だろ',
+          explanation: 'kidding = 冗談'
+        },
+        {
+          id: 4,
+          type: 'conversation',
+          source: 'Native Conversation — Meeting Friends',
+          sentence: "I'm starving. Let's grab some pizza.",
+          answer: 'starving',
+          distractors: ['hungry', 'thirsty', 'tired'],
+          translation: '意味: すごくお腹が空いた。ピザを食べに行こう。',
+          explanation: 'starving = すごくお腹が空いた'
+        },
+        {
+          id: 5,
+          type: 'conversation',
+          source: 'Native Conversation — Office Chat',
+          sentence: "Could you send me that file by the end of the day?",
+          answer: 'send',
+          distractors: ['bring', 'show', 'ask'],
+          translation: '意味: そのファイルを今日中に送ってもらえますか？',
+          explanation: 'send = 送る'
+        },
+        {
+          id: 6,
+          type: 'lyrics',
+          source: 'Blinding Lights — The Weeknd',
+          sentence: "I've been tryna call",
+          answer: 'tryna',
+          distractors: ['trying', 'calling', 'waiting'],
+          translation: '意味: 電話しようとしてた',
+          explanation: 'tryna = trying to (スラング)'
+        },
+        {
+          id: 7,
+          type: 'conversation',
+          source: 'Native Conversation — Travel',
+          sentence: "Do you know how much a one-way ticket costs?",
+          answer: 'ticket',
+          distractors: ['hotel', 'seat', 'passport'],
+          translation: '意味: 片道切符はいくらか知ってる？',
+          explanation: 'ticket = 切符／チケット'
+        }
+      ];
+    }
 
-    // Pick challenge by day-of-year so it's consistent for all users
-    const dayIdx = Math.floor(Date.now() / 86400000) % all.length;
-    const ch     = all[dayIdx];
-
-    renderChallenge(ch);
+    const dayIdx = Math.floor(Date.now() / 86400000) % challenges.length;
+    renderChallenge(challenges[dayIdx]);
   } catch (e) {
     console.warn('Challenge load failed:', e);
-    // Leave the static fallback in place
   }
 }
 
@@ -237,8 +378,8 @@ function renderChallenge(ch) {
   if (!section || !ch) return;
 
   const typeLabel = ch.type === 'conversation' ? '🗣️ Native Conversation' :
-                    ch.type === 'scene'         ? '🎬 Movie Scene'         :
-                                                  '🎵 Song Lyrics';
+    ch.type === 'scene' ? '🎬 Movie Scene' :
+      '🎵 Song Lyrics';
   section.innerHTML = `
     <div class="ch-head">
       <div class="ch-title">${typeLabel} — Fill in the blank</div>
@@ -273,7 +414,7 @@ function handleChallengeAnswer(btn, chosen, correct, explanation) {
   const section = document.querySelector('.challenge-section');
   if (section.querySelector('.correct') || section.querySelector('.wrong')) return;
 
-  const hint  = document.getElementById('ch-hint');
+  const hint = document.getElementById('ch-hint');
   const blank = document.getElementById('ch-blank');
 
   if (chosen === correct) {
@@ -281,9 +422,8 @@ function handleChallengeAnswer(btn, chosen, correct, explanation) {
     if (blank) blank.textContent = correct;
     hint.textContent = `✓ 正解！ "${correct}" — ${explanation || ''}`;
     hint.style.color = 'var(--green)';
-    // Award XP if logged in
     const user = AUTH.currentUser();
-    if (user) DB.awardXP(user.id, 200).catch(() => {});
+    if (user) DB.awardXP(user.id, 200).catch(() => { });
   } else {
     btn.classList.add('wrong');
     hint.textContent = `✗ 不正解。 The answer was "${correct}"${explanation ? ' — ' + explanation : ''}`;
@@ -297,22 +437,24 @@ function handleChallengeAnswer(btn, chosen, correct, explanation) {
 /* ── USER NAV BAR ────────────────────────────────── */
 function renderUserNav() {
   const profile = AUTH.currentProfile();
-  const xpBar   = document.querySelector('.xp-bar-mini');
-  const navBtn  = document.querySelector('.nav-btn');
+  const xpBar = document.querySelector('.xp-bar-mini');
+  const navBtn = document.querySelector('.nav-btn');
 
   if (!xpBar || !navBtn) return;
 
   if (profile) {
     const pct = Math.min(((profile.xp || 0) % 500) / 5, 100);
-    document.getElementById('xpfill') && (document.getElementById('xpfill').style.width = pct + '%');
-    document.getElementById('xpnum')  && (document.getElementById('xpnum').textContent = `${(profile.xp||0).toLocaleString()} XP`);
-    document.querySelector('.xp-label') && (document.querySelector('.xp-label').textContent = `Lv ${profile.level||1}`);
+    const xpFill = document.getElementById('xpfill');
+    const xpNum = document.getElementById('xpnum');
+    const xpLabel = document.querySelector('.xp-label');
+    if (xpFill) xpFill.style.width = pct + '%';
+    if (xpNum) xpNum.textContent = `${(profile.xp || 0).toLocaleString()} XP`;
+    if (xpLabel) xpLabel.textContent = `Lv ${profile.level || 1}`;
     navBtn.textContent = profile.username;
     navBtn.onclick = () => { AUTH.signOut().then(() => location.reload()); };
   } else {
     navBtn.textContent = 'Sign in';
     navBtn.onclick = () => { window.location.href = 'auth_page.html'; };
-    // Also update level badge
     const badge = document.querySelector('.level-badge');
     if (badge) badge.textContent = '★ Guest';
   }
@@ -322,13 +464,22 @@ function renderUserNav() {
 function extractYTId(url) {
   if (!url) return '';
   if (url.includes('youtube.com')) return url.split('v=')[1]?.split('&')[0] || '';
-  if (url.includes('youtu.be'))    return url.split('/').pop().split('?')[0] || '';
+  if (url.includes('youtu.be')) return url.split('/').pop().split('?')[0] || '';
   return url;
 }
 
 function shuffleArray(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
 }
+
+/* ── DAILY QUESTS ── */
+document.querySelectorAll('.daily-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const title = card.querySelector('.dc-title')?.textContent || '';
+    const sub = card.querySelector('.dc-sub')?.textContent || '';
+    alert(`${title}\n${sub}\n\nKeep playing to complete quests!`);
+  });
+});
 
 /* ── INIT ────────────────────────────────────────── */
 (async function init() {

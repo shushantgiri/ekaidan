@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
+
 <head>
   <meta property="og:title" content="Ekaidan - Learn English from Movies & Music">
   <meta property="og:description" content="Master real English using movie scenes and songs.">
@@ -9,17 +10,62 @@
   <title>Ekaidan - Level up your real English</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ── LANGUAGE TOGGLE ── */
+    .lang-toggle-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      border-radius: 100px;
+      padding: 3px;
+    }
+
+    .lang-opt {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.18s;
+      color: var(--txt3);
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+
+    .lang-opt.active {
+      background: var(--yellow);
+      color: #000;
+    }
+
+    [data-lang="en"] .t-jp {
+      display: none !important;
+    }
+
+    [data-lang="jp"] .t-en {
+      display: none !important;
+    }
+
+    [data-lang="jp"] .t-jp {
+      display: inline !important;
+    }
+
     /* ── STUDY MODAL ── */
     #study-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.85);
       z-index: 1000;
       overflow-y: auto;
       padding: 20px;
     }
-    #study-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+
+    #study-modal.open {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
     .study-box {
       background: var(--bg2);
       border: 0.5px solid var(--border2);
@@ -29,6 +75,7 @@
       margin: 40px auto;
       overflow: hidden;
     }
+
     .study-header {
       background: var(--bg3);
       padding: 16px 20px;
@@ -37,19 +84,37 @@
       justify-content: space-between;
       border-bottom: 0.5px solid var(--border);
     }
-    .study-title { font-size: 16px; font-weight: 700; }
-    .study-artist { font-size: 12px; color: var(--txt2); margin-top: 2px; }
-    .study-close {
-      background: none; border: none; color: var(--txt2);
-      font-size: 22px; cursor: pointer; line-height: 1;
+
+    .study-title {
+      font-size: 16px;
+      font-weight: 700;
     }
-    .study-close:hover { color: var(--txt); }
+
+    .study-artist {
+      font-size: 12px;
+      color: var(--txt2);
+      margin-top: 2px;
+    }
+
+    .study-close {
+      background: none;
+      border: none;
+      color: var(--txt2);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .study-close:hover {
+      color: var(--txt);
+    }
 
     .study-video {
       position: relative;
       padding-top: 56.25%;
       background: #000;
     }
+
     .study-video iframe {
       position: absolute;
       inset: 0;
@@ -58,7 +123,12 @@
       border: none;
     }
 
-    .study-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .study-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
     .study-section-label {
       font-size: 10px;
@@ -78,6 +148,7 @@
       line-height: 2;
       color: var(--txt);
     }
+
     .lyrics-block .lyric-line {
       display: block;
       padding: 2px 0;
@@ -85,8 +156,14 @@
       cursor: pointer;
       transition: color 0.15s;
     }
-    .lyrics-block .lyric-line:last-child { border-bottom: none; }
-    .lyrics-block .lyric-line:hover { color: var(--yellow); }
+
+    .lyrics-block .lyric-line:last-child {
+      border-bottom: none;
+    }
+
+    .lyrics-block .lyric-line:hover {
+      color: var(--yellow);
+    }
 
     .vocab-block {
       background: var(--bg3);
@@ -99,13 +176,13 @@
       white-space: pre-line;
     }
 
-    /* Quiz */
     .quiz-block {
       background: var(--bg3);
       border: 0.5px solid var(--border2);
       border-radius: 10px;
       padding: 16px;
     }
+
     .quiz-question {
       font-size: 16px;
       font-weight: 700;
@@ -113,6 +190,7 @@
       margin-bottom: 16px;
       line-height: 1.6;
     }
+
     .quiz-blank {
       display: inline-block;
       border-bottom: 2px solid var(--yellow);
@@ -123,12 +201,14 @@
       padding: 0 4px;
       margin: 0 4px;
     }
+
     .quiz-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-bottom: 12px;
     }
+
     .quiz-opt {
       background: var(--bg2);
       border: 0.5px solid var(--border2);
@@ -140,9 +220,24 @@
       transition: all 0.15s;
       color: var(--txt);
     }
-    .quiz-opt:hover { border-color: var(--blue); color: var(--blue); }
-    .quiz-opt.correct { border-color: var(--green); background: rgba(34,217,138,0.1); color: var(--green); }
-    .quiz-opt.wrong   { border-color: var(--red);   background: rgba(255,92,92,0.1);   color: var(--red); }
+
+    .quiz-opt:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .quiz-opt.correct {
+      border-color: var(--green);
+      background: rgba(34, 217, 138, 0.1);
+      color: var(--green);
+    }
+
+    .quiz-opt.wrong {
+      border-color: var(--red);
+      background: rgba(255, 92, 92, 0.1);
+      color: var(--red);
+    }
+
     .quiz-hint {
       font-size: 12px;
       text-align: center;
@@ -151,8 +246,8 @@
     }
 
     .xp-earn {
-      background: rgba(245,197,24,0.1);
-      border: 0.5px solid rgba(245,197,24,0.3);
+      background: rgba(245, 197, 24, 0.1);
+      border: 0.5px solid rgba(245, 197, 24, 0.3);
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 13px;
@@ -161,19 +256,26 @@
       text-align: center;
       display: none;
     }
-    .xp-earn.show { display: block; }
 
-    /* ── PLAYER (scene video overlay) ── */
+    .xp-earn.show {
+      display: block;
+    }
+
+    /* ── PLAYER ── */
     #scene-player {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0, 0, 0, 0.92);
       z-index: 999;
       align-items: center;
       justify-content: center;
     }
-    #scene-player.open { display: flex; }
+
+    #scene-player.open {
+      display: flex;
+    }
+
     .scene-player-box {
       background: #111;
       border-radius: 12px;
@@ -182,17 +284,20 @@
       max-width: 620px;
       margin: 20px;
     }
+
     .scene-player-box h2 {
       font-size: 16px;
       margin-bottom: 14px;
       color: var(--txt);
     }
+
     .scene-player-box iframe {
       width: 100%;
       height: 300px;
       border: none;
       border-radius: 8px;
     }
+
     .scene-player-box button {
       margin-top: 12px;
       background: var(--bg3);
@@ -203,539 +308,972 @@
       cursor: pointer;
       font-size: 13px;
     }
+
+    /* ── SONGS MODAL ── */
+    #songs-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 1100;
+      padding: 20px;
+      overflow-y: auto;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    #songs-modal.open {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .songs-modal-box {
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 860px;
+      margin: 40px auto;
+      overflow: hidden;
+      animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .songs-modal-header {
+      background: var(--bg3);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .songs-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .songs-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .songs-modal-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt3);
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: 100px;
+      padding: 3px 10px;
+    }
+
+    .songs-modal-close {
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      color: var(--txt2);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .songs-modal-close:hover {
+      color: var(--txt);
+      background: var(--bg3);
+      border-color: var(--border2);
+    }
+
+    .songs-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      padding: 20px 24px 28px;
+    }
+
+    .songs-modal-card {
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .songs-modal-card:hover {
+      border-color: rgba(245, 197, 24, 0.5);
+      background: rgba(245, 197, 24, 0.04);
+      transform: translateY(-2px);
+    }
+
+    .songs-modal-card .smc-icon {
+      font-size: 24px;
+      width: 46px;
+      height: 46px;
+      background: var(--bg2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 0.5px solid var(--border);
+    }
+
+    .songs-modal-card .smc-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .songs-modal-card .smc-title {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--txt);
+    }
+
+    .songs-modal-card .smc-artist {
+      font-size: 12px;
+      color: var(--txt3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .songs-modal-card .smc-xp {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--yellow);
+      background: rgba(245, 197, 24, 0.1);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    .songs-modal-card .smc-play {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #000;
+      font-size: 12px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.18s, transform 0.18s;
+    }
+
+    .songs-modal-card:hover .smc-play {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ── SEE MORE BUTTON ── */
+    .songs-see-more {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .see-more-btn {
+      background: var(--bg3);
+      border: 0.5px solid var(--border2);
+      color: var(--txt2);
+      padding: 9px 22px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .see-more-btn:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(245, 197, 24, 0.06);
+    }
+
+    .see-more-btn .btn-count {
+      background: rgba(245, 197, 24, 0.15);
+      color: var(--yellow);
+      border-radius: 100px;
+      padding: 1px 8px;
+      font-size: 11px;
+    }
   </style>
 </head>
 
 <body>
 
-<!-- ── NAV ── -->
-<nav>
-  <div class="logo">E<span>kaidan</span></div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="xp-bar-mini">
-      <div class="xp-label">Lv 7</div>
-      <div class="xp-track"><div class="xp-fill" id="xpfill"></div></div>
-      <div style="font-size:11px;color:var(--txt2)" id="xpnum">620 / 1000 XP</div>
-    </div>
-    <div class="level-badge">★ Samurai</div>
-  </div>
-  <button class="nav-btn">Play now</button>
-</nav>
-
-<!-- ── HERO ── -->
-<div class="hero">
-  <div class="hero-eyebrow"><div class="pulse"></div> 8,241 players online now</div>
-  <h1>Level up your<br><span class="hl">real English</span></h1>
-  <p>Learn from movies & music. Earn XP. Beat your friends. Actually have fun.</p>
-  <div class="modes-row">
-    <div class="mode-btn active" id="m1">🎬 <span>Movie Mode</span></div>
-    <div class="mode-btn" id="m2">🎵 <span>Music Mode</span></div>
-    <div class="mode-btn" id="m3">⚡ <span>Speed Round</span></div>
-    <div class="mode-btn" id="m4">🆚 <span>Battle</span></div>
-  </div>
-</div>
-
-<!-- ── HOT RIGHT NOW ── -->
-<div class="section">
-  <div class="sec-head">
-    <div class="sec-title">🔥 Hot right now</div>
-    <div class="sec-link">See all →</div>
-  </div>
-  <!-- ── SONGS (from Supabase) ── -->
-<div class="section">
-  <div class="sec-head">
-    <div class="sec-title">🎵 Songs</div>
-  </div>
-  <div class="songs-container" id="songs-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
-</div>
-
-  <div class="scene-card-big">
-    <div class="scene-screen">
-      <div class="screen-inner">
-        <div class="movie-title">Spider-Man: Homecoming</div>
-        <div class="play-circle"><div class="play-tri"></div></div>
-        <div style="font-size:11px;color:var(--txt3);margin-top:8px">Tap to play scene</div>
-      </div>
-      <div class="scene-tags">
-        <span class="tag diff-med">Intermediate</span>
-        <span class="tag genre">Slang</span>
-      </div>
-      <div class="xp-tag">+120 XP</div>
-    </div>
-    <div class="scene-bottom">
-      <div class="scene-info">
-        <div class="title">Spider-Man: Homecoming</div>
-        <div class="sub">6 lines · "You've got to be kidding me" · Confrontation scene</div>
-      </div>
-      <div class="scene-meta">
-        <div class="hearts">
-          <div class="heart"></div><div class="heart"></div><div class="heart"></div>
-          <div class="heart" style="background:var(--txt3)"></div>
-          <div class="heart" style="background:var(--txt3)"></div>
+  <!-- ── NAV ── -->
+  <nav>
+    <div class="logo">E<span>kaidan</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="xp-bar-mini">
+        <div class="xp-label">Lv 7</div>
+        <div class="xp-track">
+          <div class="xp-fill" id="xpfill"></div>
         </div>
-        <div class="combo-badge">x3 COMBO</div>
+        <div style="font-size:11px;color:var(--txt2)" id="xpnum">620 / 1000 XP</div>
+      </div>
+      <div class="level-badge">★ Samurai</div>
+      <div class="lang-toggle-wrap" id="lang-toggle">
+        <div class="lang-opt active" data-l="en">EN</div>
+        <div class="lang-opt" data-l="jp">日本語</div>
+      </div>
+    </div>
+    <button class="nav-btn">
+      <span class="t-en">Play now</span>
+      <span class="t-jp">遊ぶ</span>
+    </button>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <div class="pulse"></div>
+      <span class="t-en">8,241 players online now</span>
+      <span class="t-jp">今8,241人がプレイ中</span>
+    </div>
+    <h1>
+      <span class="t-en">Level up your<br><span class="hl">real English</span></span>
+      <span class="t-jp">本物の英語で<br><span class="hl">レベルアップ</span></span>
+    </h1>
+    <p>
+      <span class="t-en">Learn from movies & music. Earn XP. Beat your friends. Actually have fun.</span>
+      <span class="t-jp">映画と音楽で英語を学ぼう。XPを稼いで、友達に勝とう。本当に楽しい。</span>
+    </p>
+    <div class="modes-row">
+      <div class="mode-btn active" id="m1">🎬 <span class="t-en">Movie Mode</span><span class="t-jp">映画モード</span></div>
+      <div class="mode-btn" id="m2">🎵 <span class="t-en">Music Mode</span><span class="t-jp">音楽モード</span></div>
+      <div class="mode-btn" id="m3">⚡ <span class="t-en">Speed Round</span><span class="t-jp">スピードラウンド</span></div>
+      <div class="mode-btn" id="m4">🆚 <span class="t-en">Battle</span><span class="t-jp">バトル</span></div>
+    </div>
+  </div>
+
+  <!-- ── HOT RIGHT NOW ── -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title">
+        🔥 <span class="t-en">Hot right now</span><span class="t-jp">今人気</span>
+      </div>
+      <div class="sec-link">
+        <span class="t-en">See all →</span><span class="t-jp">すべて見る →</span>
+      </div>
+    </div>
+
+    <!-- ── SONGS ── -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-title">🎵 <span class="t-en">Songs</span><span class="t-jp">楽曲</span></div>
+      </div>
+      <div class="songs-container" id="songs-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      </div>
+      <!-- See more button injected here by JS -->
+    </div>
+
+    <div class="scene-card-big">
+      <div class="scene-screen">
+        <div class="screen-inner">
+          <div class="movie-title">Spider-Man: Homecoming</div>
+          <div class="play-circle">
+            <div class="play-tri"></div>
+          </div>
+          <div style="font-size:11px;color:var(--txt3);margin-top:8px">
+            <span class="t-en">Tap to play scene</span>
+            <span class="t-jp">タップして再生</span>
+          </div>
+        </div>
+        <div class="scene-tags">
+          <span class="tag diff-med">
+            <span class="t-en">Intermediate</span><span class="t-jp">中級</span>
+          </span>
+          <span class="tag genre">Slang</span>
+        </div>
+        <div class="xp-tag">+120 XP</div>
+      </div>
+      <div class="scene-bottom">
+        <div class="scene-info">
+          <div class="title">Spider-Man: Homecoming</div>
+          <div class="sub">
+            <span class="t-en">6 lines · "You've got to be kidding me" · Confrontation scene</span>
+            <span class="t-jp">6行 · スラング · 対立シーン</span>
+          </div>
+        </div>
+        <div class="scene-meta">
+          <div class="hearts">
+            <div class="heart"></div>
+            <div class="heart"></div>
+            <div class="heart"></div>
+            <div class="heart" style="background:var(--txt3)"></div>
+            <div class="heart" style="background:var(--txt3)"></div>
+          </div>
+          <div class="combo-badge">x3 COMBO</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards-3">
+      <div class="mini-card">
+        <div class="mc-icon">👠</div>
+        <div class="mc-title">Devil Wears Prada</div>
+        <div class="mc-sub"><span class="t-en">Office sarcasm · 8 lines</span><span class="t-jp">オフィス皮肉 · 8行</span>
+        </div>
+        <div class="mc-xp">+95 XP</div>
+      </div>
+      <div class="mini-card">
+        <div class="mc-icon">🎓</div>
+        <div class="mc-title">Good Will Hunting</div>
+        <div class="mc-sub"><span class="t-en">Deep emotion · 5 lines</span><span class="t-jp">感情表現 · 5行</span></div>
+        <div class="mc-xp">+80 XP</div>
+      </div>
+      <div class="mini-card">
+        <div class="mc-icon">🌀</div>
+        <div class="mc-title">Inception</div>
+        <div class="mc-sub"><span class="t-en">Mind-bending · 7 lines</span><span class="t-jp">難解 · 7行</span></div>
+        <div class="mc-xp">+140 XP</div>
       </div>
     </div>
   </div>
-  <div class="cards-3">
-    <div class="mini-card">
-      <div class="mc-icon">👠</div>
-      <div class="mc-title">Devil Wears Prada</div>
-      <div class="mc-sub">Office sarcasm · 8 lines</div>
-      <div class="mc-xp">+95 XP</div>
+
+  <!-- ── PUBLISHED SCENES ── -->
+  <div id="dynamic-scenes-section" style="max-width:860px;margin:0 auto;padding:0 28px 48px;display:none">
+    <div class="sec-head">
+      <div class="sec-title">🎬 <span class="t-en">Published Scenes</span><span class="t-jp">公開シーン</span></div>
     </div>
-    <div class="mini-card">
-      <div class="mc-icon">🎓</div>
-      <div class="mc-title">Good Will Hunting</div>
-      <div class="mc-sub">Deep emotion · 5 lines</div>
-      <div class="mc-xp">+80 XP</div>
-    </div>
-    <div class="mini-card">
-      <div class="mc-icon">🌀</div>
-      <div class="mc-title">Inception</div>
-      <div class="mc-sub">Mind-bending · 7 lines</div>
-      <div class="mc-xp">+140 XP</div>
-    </div>
+    <div class="cards-3" id="dynamic-scenes-grid"></div>
   </div>
-</div>
 
-<!-- ── PUBLISHED SCENES (from Supabase) ── -->
-<div id="dynamic-scenes-section" style="max-width:860px;margin:0 auto;padding:0 28px 48px;display:none">
-  <div class="sec-head">
-    <div class="sec-title">🎬 Published Scenes</div>
-  </div>
-  <div class="cards-3" id="dynamic-scenes-grid"></div>
-</div>
-
-<!-- ── DAILY CHALLENGE ── -->
-<div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
-  <div class="sec-head">
-    <div class="sec-title">⚡ Daily challenge</div>
-    <div class="ch-timer">
-      <span>Resets in 4h 22m</span>
-      <div class="timer-track"><div class="timer-fill" id="tfill" style="width:82%"></div></div>
-    </div>
-  </div>
-</div>
-<div class="challenge-section">
-  <div class="ch-head">
-    <div class="ch-title">Fill in the blank</div>
-    <div class="ch-badge">+200 XP bonus</div>
-  </div>
-  <div style="font-size:12px;color:var(--txt2);margin-bottom:4px;text-align:center">Shape of You — Ed Sheeran</div>
-  <div class="ch-question">
-    "The <div class="blank" id="blank1">_____</div> of your body in the sound"
-  </div>
-  <div style="font-size:12px;color:var(--txt2);text-align:center;margin-bottom:16px">意味: あなたの体の形が音の中に</div>
-  <div class="ch-options">
-    <div class="ch-opt" onclick="answer(this,'wrong')">movement</div>
-    <div class="ch-opt" onclick="answer(this,'correct')">shape</div>
-    <div class="ch-opt" onclick="answer(this,'wrong')">rhythm</div>
-    <div class="ch-opt" onclick="answer(this,'wrong')">sound</div>
-  </div>
-  <div style="font-size:11px;color:var(--txt3);text-align:center;margin-top:12px" id="hint">選んでください — Choose your answer</div>
-</div>
-
-<!-- ── LEADERBOARD ── -->
-<div style="max-width:860px;margin:0 auto;padding:0 28px 16px">
-  <div class="sec-head">
-    <div class="sec-title">🏆 Weekly leaderboard</div>
-    <div class="sec-link">Your league →</div>
-  </div>
-</div>
-<div class="leaderboard" style="margin-left:28px;margin-right:28px">
-  <div class="lb-head">
-    <div class="lb-title">Samurai League</div>
-    <div class="lb-sub">Top 3 promote to Master League</div>
-  </div>
-  <div class="lb-row">
-    <div class="lb-rank gold">1</div>
-    <div class="lb-avatar" style="background:#f5c51822;color:var(--yellow)">YK</div>
-    <div class="lb-name">Yuki_Kaze</div>
-    <div class="lb-score">4,280 XP</div>
-    <div class="lb-streak" style="color:var(--orange)">🔥 21</div>
-  </div>
-  <div class="lb-row">
-    <div class="lb-rank silver">2</div>
-    <div class="lb-avatar" style="background:#aaa2;color:#aaa">HN</div>
-    <div class="lb-name">hana_nihongo</div>
-    <div class="lb-score">3,910 XP</div>
-    <div class="lb-streak">🔥 14</div>
-  </div>
-  <div class="lb-row me">
-    <div class="lb-rank" style="color:var(--yellow)">3</div>
-    <div class="lb-avatar" style="background:rgba(79,163,255,0.15);color:var(--blue)">ME</div>
-    <div class="lb-name">You <span class="lb-you">★ me</span></div>
-    <div class="lb-score">3,640 XP</div>
-    <div class="lb-streak" style="color:var(--green)">🔥 14</div>
-  </div>
-  <div class="lb-row">
-    <div class="lb-rank">4</div>
-    <div class="lb-avatar" style="background:#2222;color:var(--txt3)">TM</div>
-    <div class="lb-name">tomo_eigo</div>
-    <div class="lb-score">3,580 XP</div>
-    <div class="lb-streak">🔥 9</div>
-  </div>
-  <div class="lb-row">
-    <div class="lb-rank">5</div>
-    <div class="lb-avatar" style="background:#2222;color:var(--txt3)">RS</div>
-    <div class="lb-name">risa_speaks</div>
-    <div class="lb-score">3,100 XP</div>
-    <div class="lb-streak">🔥 5</div>
-  </div>
-</div>
-
-<!-- ── DAILY QUESTS ── -->
-<div style="max-width:860px;margin:24px auto 0;padding:0 28px">
-  <div class="sec-head">
-    <div class="sec-title">📅 Today's quests</div>
-    <div style="font-size:12px;color:var(--txt2)">3 / 4 done</div>
-  </div>
-</div>
-<div class="daily-row">
-  <div class="daily-card">
-    <div class="dc-top"><div class="dc-icon">🎬</div><div class="dc-done">Done ✓</div></div>
-    <div class="dc-title">Watch 1 scene</div>
-    <div class="dc-sub">Spider-Man completed</div>
-    <div class="dc-xp">+80 XP earned</div>
-    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
-  </div>
-  <div class="daily-card">
-    <div class="dc-top"><div class="dc-icon">🎵</div><div class="dc-done">Done ✓</div></div>
-    <div class="dc-title">Finish a song</div>
-    <div class="dc-sub">Shape of You · karaoke mode</div>
-    <div class="dc-xp">+60 XP earned</div>
-    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
-  </div>
-  <div class="daily-card">
-    <div class="dc-top"><div class="dc-icon">🗣️</div><div class="dc-done">Done ✓</div></div>
-    <div class="dc-title">Shadow 3 lines</div>
-    <div class="dc-sub">Pronunciation: 88% accuracy</div>
-    <div class="dc-xp">+90 XP earned</div>
-    <div class="dc-progress"><div class="dc-fill" style="width:100%"></div></div>
-  </div>
-  <div class="daily-card" style="border-color:rgba(245,197,24,0.3)">
-    <div class="dc-top"><div class="dc-icon">⚡</div><div class="dc-pending">2 left</div></div>
-    <div class="dc-title">Beat a friend</div>
-    <div class="dc-sub">Challenge 任意の友達 in Battle mode</div>
-    <div class="dc-xp">+150 XP waiting</div>
-    <div class="dc-progress"><div class="dc-fill" style="width:33%;background:var(--yellow)"></div></div>
-  </div>
-</div>
-
-<!-- ── BADGES ── -->
-<div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
-  <div class="sec-head"><div class="sec-title">🏅 Your badges</div><div class="sec-link">All 34 badges →</div></div>
-</div>
-<div class="streak-row">
-  <div class="streak-big">
-    <div class="streak-num" id="streaknum">14</div>
-    <div class="streak-sub">day streak</div>
-    <div class="flame-row">
-      <div class="flame lit"></div><div class="flame lit"></div><div class="flame lit"></div>
-      <div class="flame lit"></div><div class="flame lit"></div><div class="flame lit"></div>
-      <div class="flame lit"></div><div class="flame"></div><div class="flame"></div><div class="flame"></div>
-    </div>
-  </div>
-  <div class="badges-grid">
-    <div class="badge-item"><div class="badge-icon">🎬</div><div class="badge-name">Movie Fan</div></div>
-    <div class="badge-item"><div class="badge-icon">🎵</div><div class="badge-name">Lyricist</div></div>
-    <div class="badge-item"><div class="badge-icon">🔥</div><div class="badge-name">14-Day Streak</div></div>
-    <div class="badge-item"><div class="badge-icon">⚡</div><div class="badge-name">Speed Demon</div></div>
-    <div class="badge-item locked"><div class="badge-icon">👑</div><div class="badge-name">League King</div></div>
-    <div class="badge-item locked"><div class="badge-icon">🎤</div><div class="badge-name">Karaoke Pro</div></div>
-    <div class="badge-item locked"><div class="badge-icon">🌟</div><div class="badge-name">100 Scenes</div></div>
-    <div class="badge-item locked"><div class="badge-icon">🆚</div><div class="badge-name">Undefeated</div></div>
-  </div>
-</div>
-
-<!-- ── CTA ── -->
-<div class="cta-band">
-  <h2>Ready to play?</h2>
-  <p>Join 8,000+ learners. Free to start. Actually addictive.</p>
-  <div class="cta-row">
-    <button class="cta-dark">Start playing →</button>
-    <button class="cta-ghost">Watch trailer</button>
-  </div>
-</div>
-
-
-<!-- ── FOOTER ── -->
-<footer>
-  <div class="logo" style="font-size:15px">E<span>kaidan</span></div>
-  <div>English learning for Japanese players · 日本語サポート完備</div>
-  <div style="display:flex;gap:16px"><span style="cursor:pointer">Privacy</span><span style="cursor:pointer">Terms</span></div>
-</footer>
-
-<!-- ══════════════════════════════════
-     STUDY MODAL (songs)
-════════════════════════════════════ -->
-<div id="study-modal">
-  <div class="study-box">
-    <div class="study-header">
-      <div>
-        <div class="study-title" id="study-title">Song Title</div>
-        <div class="study-artist" id="study-artist">Artist</div>
+  <!-- ── DAILY CHALLENGE ── -->
+  <div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
+    <div class="sec-head">
+      <div class="sec-title">⚡ <span class="t-en">Daily challenge</span><span class="t-jp">デイリーチャレンジ</span></div>
+      <div class="ch-timer">
+        <span class="t-en">Resets in 4h 22m</span>
+        <span class="t-jp">4時間22分後にリセット</span>
+        <div class="timer-track">
+          <div class="timer-fill" id="tfill" style="width:82%"></div>
+        </div>
       </div>
-      <button class="study-close" onclick="closeStudy()">✕</button>
-    </div>
-
-    <!-- YouTube embed -->
-    <div class="study-video" id="study-video-wrap">
-      <iframe id="study-iframe" allowfullscreen allow="autoplay"></iframe>
-    </div>
-
-    <div class="study-body">
-
-      <!-- Lyrics -->
-      <div id="study-lyrics-section">
-        <div class="study-section-label">📝 Lyrics</div>
-        <div class="lyrics-block" id="study-lyrics"></div>
-      </div>
-
-      <!-- Vocab -->
-      <div id="study-vocab-section">
-        <div class="study-section-label">📖 Key Vocabulary</div>
-        <div class="vocab-block" id="study-vocab"></div>
-      </div>
-
-      <!-- Quiz -->
-      <div class="quiz-block" id="study-quiz" style="display:none">
-        <div class="study-section-label">🧠 Fill in the Blank</div>
-        <div class="quiz-question" id="quiz-question"></div>
-        <div class="quiz-options" id="quiz-options"></div>
-        <div class="quiz-hint" id="quiz-hint">Choose your answer</div>
-      </div>
-
-      <!-- XP earned -->
-      <div class="xp-earn" id="xp-earn-banner"></div>
-
     </div>
   </div>
-</div>
-
-<!-- ══════════════════════════════════
-     SCENE PLAYER
-════════════════════════════════════ -->
-<div id="scene-player">
-  <div class="scene-player-box">
-    <h2 id="scene-player-title"></h2>
-    <iframe id="scene-player-iframe" allowfullscreen></iframe>
-    <button onclick="closeScenePlayer()">✕ Close</button>
+  <div class="challenge-section">
+    <div class="ch-head">
+      <div class="ch-title">
+        <span class="t-en">Fill in the blank</span>
+        <span class="t-jp">空欄を埋めよう</span>
+      </div>
+      <div class="ch-badge">+200 XP bonus</div>
+    </div>
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:4px;text-align:center">Shape of You — Ed Sheeran</div>
+    <div class="ch-question">
+      "The <div class="blank" id="blank1">_____</div> of your body in the sound"
+    </div>
+    <div style="font-size:12px;color:var(--txt2);text-align:center;margin-bottom:16px">
+      <span class="t-en">意味: あなたの体の形が音の中に</span>
+      <span class="t-jp">Meaning: The shape of your body in the sound</span>
+    </div>
+    <div class="ch-options">
+      <div class="ch-opt" onclick="answer(this,'wrong')">movement</div>
+      <div class="ch-opt" onclick="answer(this,'correct')">shape</div>
+      <div class="ch-opt" onclick="answer(this,'wrong')">rhythm</div>
+      <div class="ch-opt" onclick="answer(this,'wrong')">sound</div>
+    </div>
+    <div style="font-size:11px;color:var(--txt3);text-align:center;margin-top:12px" id="hint">
+      <span class="t-en">選んでください — Choose your answer</span>
+      <span class="t-jp">答えを選んでください</span>
+    </div>
   </div>
-</div>
 
-<!-- ══════════════════════════════════
-     SCRIPTS
-════════════════════════════════════ -->
-<script>
-/* ── Mode buttons ── */
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
+  <!-- ── LEADERBOARD ── -->
+  <div class="section">
+    <div class="sec-head" style="justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;">
+      <div class="sec-title">🏆 <span class="t-en">Weekly leaderboard</span><span class="t-jp">週間ランキング</span></div>
+      <div class="sec-link">
+        <span class="t-en">Your league →</span><span class="t-jp">あなたのリーグ →</span>
+      </div>
+    </div>
+  </div>
+  <div class="leaderboard">
+    <div class="lb-head">
+      <div class="lb-title"><span class="t-en">Samurai League</span><span class="t-jp">侍リーグ</span></div>
+      <div class="lb-sub"><span class="t-en">Top 3 promote to Master League</span><span
+          class="t-jp">上位3人がマスターリーグへ</span></div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank gold">1</div>
+      <div class="lb-avatar" style="background:#f5c51822;color:var(--yellow)">YK</div>
+      <div class="lb-name">Yuki_Kaze</div>
+      <div class="lb-score">4,280 XP</div>
+      <div class="lb-streak" style="color:var(--orange)">🔥 21</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank silver">2</div>
+      <div class="lb-avatar" style="background:#aaa2;color:#aaa">HN</div>
+      <div class="lb-name">hana_nihongo</div>
+      <div class="lb-score">3,910 XP</div>
+      <div class="lb-streak">🔥 14</div>
+    </div>
+    <div class="lb-row me">
+      <div class="lb-rank" style="color:var(--yellow)">3</div>
+      <div class="lb-avatar" style="background:rgba(79,163,255,0.15);color:var(--blue)">ME</div>
+      <div class="lb-name">
+        <span class="t-en">You</span><span class="t-jp">あなた</span>
+        <span class="lb-you">★ me</span>
+      </div>
+      <div class="lb-score">3,640 XP</div>
+      <div class="lb-streak" style="color:var(--green)">🔥 14</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">4</div>
+      <div class="lb-avatar" style="background:#2222;color:var(--txt3)">TM</div>
+      <div class="lb-name">tomo_eigo</div>
+      <div class="lb-score">3,580 XP</div>
+      <div class="lb-streak">🔥 9</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank">5</div>
+      <div class="lb-avatar" style="background:#2222;color:var(--txt3)">RS</div>
+      <div class="lb-name">risa_speaks</div>
+      <div class="lb-score">3,100 XP</div>
+      <div class="lb-streak">🔥 5</div>
+    </div>
+  </div>
 
-/* ── Daily challenge answer ── */
-function answer(el, result) {
-  if (document.querySelector('.ch-opt.correct') || document.querySelector('.ch-opt.wrong')) return;
-  el.classList.add(result);
-  const hint  = document.getElementById('hint');
-  const blank = document.getElementById('blank1');
-  const xpfill = document.getElementById('xpfill');
-  const xpnum  = document.getElementById('xpnum');
-  if (result === 'correct') {
-    blank.textContent = 'shape';
-    hint.textContent  = '✓ 正解！ "shape" = 形 · +200 XP!';
-    hint.style.color  = 'var(--green)';
-    let cur = 62;
-    const iv = setInterval(() => {
-      cur = Math.min(cur + 2, 82);
-      xpfill.style.width = cur + '%';
-      xpnum.textContent  = Math.round(cur * 10) + ' / 1000 XP';
-      if (cur >= 82) clearInterval(iv);
-    }, 30);
-  } else {
-    hint.textContent = '✗ 不正解。 "shape" が正解 — "形"という意味。Try again!';
-    hint.style.color = 'var(--red)';
-    document.querySelectorAll('.ch-opt').forEach(o => {
-      if (o.textContent.trim() === 'shape') o.classList.add('correct');
+  <!-- ── DAILY QUESTS ── -->
+  <div style="max-width:860px;margin:24px auto 0;padding:0 28px">
+    <div class="sec-head">
+      <div class="sec-title">📅 <span class="t-en">Today's quests</span><span class="t-jp">今日のクエスト</span></div>
+      <div style="font-size:12px;color:var(--txt2)">3 / 4 <span class="t-en">done</span><span class="t-jp">完了</span>
+      </div>
+    </div>
+  </div>
+  <div class="daily-row">
+    <div class="daily-card">
+      <div class="dc-top">
+        <div class="dc-icon">🎬</div>
+        <div class="dc-done"><span class="t-en">Done ✓</span><span class="t-jp">完了 ✓</span></div>
+      </div>
+      <div class="dc-title"><span class="t-en">Watch 1 scene</span><span class="t-jp">シーンを1つ見る</span></div>
+      <div class="dc-sub"><span class="t-en">Spider-Man completed</span><span class="t-jp">スパイダーマン完了</span></div>
+      <div class="dc-xp">+80 XP <span class="t-en">earned</span><span class="t-jp">獲得</span></div>
+      <div class="dc-progress">
+        <div class="dc-fill" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="daily-card">
+      <div class="dc-top">
+        <div class="dc-icon">🎵</div>
+        <div class="dc-done"><span class="t-en">Done ✓</span><span class="t-jp">完了 ✓</span></div>
+      </div>
+      <div class="dc-title"><span class="t-en">Finish a song</span><span class="t-jp">曲を1曲完了</span></div>
+      <div class="dc-sub"><span class="t-en">Shape of You · karaoke mode</span><span class="t-jp">Shape of You ·
+          カラオケモード</span></div>
+      <div class="dc-xp">+60 XP <span class="t-en">earned</span><span class="t-jp">獲得</span></div>
+      <div class="dc-progress">
+        <div class="dc-fill" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="daily-card">
+      <div class="dc-top">
+        <div class="dc-icon">🗣️</div>
+        <div class="dc-done"><span class="t-en">Done ✓</span><span class="t-jp">完了 ✓</span></div>
+      </div>
+      <div class="dc-title"><span class="t-en">Shadow 3 lines</span><span class="t-jp">3行シャドーイング</span></div>
+      <div class="dc-sub"><span class="t-en">Pronunciation: 88% accuracy</span><span class="t-jp">発音精度: 88%</span></div>
+      <div class="dc-xp">+90 XP <span class="t-en">earned</span><span class="t-jp">獲得</span></div>
+      <div class="dc-progress">
+        <div class="dc-fill" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="daily-card" style="border-color:rgba(245,197,24,0.3)">
+      <div class="dc-top">
+        <div class="dc-icon">⚡</div>
+        <div class="dc-pending"><span class="t-en">2 left</span><span class="t-jp">あと2つ</span></div>
+      </div>
+      <div class="dc-title"><span class="t-en">Beat a friend</span><span class="t-jp">友達に勝つ</span></div>
+      <div class="dc-sub"><span class="t-en">Challenge 任意の友達 in Battle mode</span><span class="t-jp">バトルモードで友達に挑戦</span>
+      </div>
+      <div class="dc-xp">+150 XP <span class="t-en">waiting</span><span class="t-jp">待機中</span></div>
+      <div class="dc-progress">
+        <div class="dc-fill" style="width:33%;background:var(--yellow)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BADGES ── -->
+  <div style="max-width:860px;margin:0 auto;padding:0 28px 20px">
+    <div class="sec-head">
+      <div class="sec-title">🏅 <span class="t-en">Your badges</span><span class="t-jp">あなたのバッジ</span></div>
+      <div class="sec-link"><span class="t-en">All 34 badges →</span><span class="t-jp">全34バッジ →</span></div>
+    </div>
+  </div>
+  <div class="streak-row">
+    <div class="streak-big">
+      <div class="streak-num" id="streaknum">14</div>
+      <div class="streak-sub"><span class="t-en">day streak</span><span class="t-jp">日連続</span></div>
+      <div class="flame-row">
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame lit"></div>
+        <div class="flame"></div>
+        <div class="flame"></div>
+        <div class="flame"></div>
+      </div>
+    </div>
+    <div class="badges-grid">
+      <div class="badge-item">
+        <div class="badge-icon">🎬</div>
+        <div class="badge-name"><span class="t-en">Movie Fan</span><span class="t-jp">映画ファン</span></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon">🎵</div>
+        <div class="badge-name"><span class="t-en">Lyricist</span><span class="t-jp">作詞家</span></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon">🔥</div>
+        <div class="badge-name"><span class="t-en">14-Day Streak</span><span class="t-jp">14日連続</span></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon">⚡</div>
+        <div class="badge-name"><span class="t-en">Speed Demon</span><span class="t-jp">スピード悪魔</span></div>
+      </div>
+      <div class="badge-item locked">
+        <div class="badge-icon">👑</div>
+        <div class="badge-name"><span class="t-en">League King</span><span class="t-jp">リーグ王</span></div>
+      </div>
+      <div class="badge-item locked">
+        <div class="badge-icon">🎤</div>
+        <div class="badge-name"><span class="t-en">Karaoke Pro</span><span class="t-jp">カラオケ名人</span></div>
+      </div>
+      <div class="badge-item locked">
+        <div class="badge-icon">🌟</div>
+        <div class="badge-name"><span class="t-en">100 Scenes</span><span class="t-jp">100シーン</span></div>
+      </div>
+      <div class="badge-item locked">
+        <div class="badge-icon">🆚</div>
+        <div class="badge-name"><span class="t-en">Undefeated</span><span class="t-jp">無敵</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="cta-band">
+    <h2><span class="t-en">Ready to play?</span><span class="t-jp">さあ、始めよう！</span></h2>
+    <p>
+      <span class="t-en">Join 8,000+ learners. Free to start. Actually addictive.</span>
+      <span class="t-jp">8,000人以上が参加中。無料スタート。本当にハマる。</span>
+    </p>
+    <div class="cta-row">
+      <button class="cta-dark"><span class="t-en">Start playing →</span><span class="t-jp">プレイ開始 →</span></button>
+      <button class="cta-ghost"><span class="t-en">Watch trailer</span><span class="t-jp">予告編を見る</span></button>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="logo" style="font-size:15px">E<span>kaidan</span></div>
+    <div>
+      <span class="t-en">English learning for Japanese players · 日本語サポート完備</span>
+      <span class="t-jp">日本人向け英語学習 · English support available</span>
+    </div>
+    <div style="display:flex;gap:16px">
+      <span style="cursor:pointer"><span class="t-en">Privacy</span><span class="t-jp">プライバシー</span></span>
+      <span style="cursor:pointer"><span class="t-en">Terms</span><span class="t-jp">利用規約</span></span>
+    </div>
+  </footer>
+
+  <!-- ── STUDY MODAL ── -->
+  <div id="study-modal">
+    <div class="study-box">
+      <div class="study-header">
+        <div>
+          <div class="study-title" id="study-title">Song Title</div>
+          <div class="study-artist" id="study-artist">Artist</div>
+        </div>
+        <button class="study-close" onclick="closeStudy()">✕</button>
+      </div>
+      <div class="study-video" id="study-video-wrap">
+        <iframe id="study-iframe" allowfullscreen allow="autoplay"></iframe>
+      </div>
+      <div class="study-body">
+        <div id="study-lyrics-section">
+          <div class="study-section-label">📝 <span class="t-en">Lyrics</span><span class="t-jp">歌詞</span></div>
+          <div class="lyrics-block" id="study-lyrics"></div>
+        </div>
+        <div id="study-vocab-section">
+          <div class="study-section-label">📖 <span class="t-en">Key Vocabulary</span><span class="t-jp">重要単語</span>
+          </div>
+          <div class="vocab-block" id="study-vocab"></div>
+        </div>
+        <div class="quiz-block" id="study-quiz" style="display:none">
+          <div class="study-section-label">🧠 <span class="t-en">Fill in the Blank</span><span
+              class="t-jp">空欄を埋めよう</span></div>
+          <div class="quiz-question" id="quiz-question"></div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div class="quiz-hint" id="quiz-hint">
+            <span class="t-en">Choose your answer</span><span class="t-jp">答えを選んでください</span>
+          </div>
+        </div>
+        <div class="xp-earn" id="xp-earn-banner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCENE PLAYER ── -->
+  <div id="scene-player">
+    <div class="scene-player-box">
+      <h2 id="scene-player-title"></h2>
+      <iframe id="scene-player-iframe" allowfullscreen></iframe>
+      <button onclick="closeScenePlayer()">✕ <span class="t-en">Close</span><span class="t-jp">閉じる</span></button>
+    </div>
+  </div>
+
+  <!-- ── SONGS MODAL ── -->
+  <div id="songs-modal">
+    <div class="songs-modal-box">
+      <div class="songs-modal-header">
+        <div class="songs-modal-header-left">
+          <div class="songs-modal-title">🎵 <span class="t-en">All Songs</span><span class="t-jp">全楽曲</span></div>
+          <div class="songs-modal-count" id="songs-modal-count">0</div>
+        </div>
+        <button class="songs-modal-close" onclick="closeSongsModal()">✕</button>
+      </div>
+      <div class="songs-modal-grid" id="songs-modal-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── LEADERBOARD MODAL ── -->
+  <div id="leaderboard-modal"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;padding:20px;overflow-y:auto">
+    <div
+      style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;width:100%;max-width:500px;margin:40px auto;padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:18px">🏆 <span class="t-en">Full Leaderboard</span><span class="t-jp">全ランキング</span></h2>
+        <button onclick="closeLeaderboardModal()"
+          style="background:none;border:none;color:var(--txt2);font-size:22px;cursor:pointer">✕</button>
+      </div>
+      <div id="full-leaderboard-content"></div>
+    </div>
+  </div>
+
+  <!-- ── BADGES MODAL ── -->
+  <div id="badges-modal"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;padding:20px;overflow-y:auto">
+    <div
+      style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;width:100%;max-width:600px;margin:40px auto;padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:18px">🏅 <span class="t-en">All Badges</span><span class="t-jp">全バッジ</span></h2>
+        <button onclick="closeBadgesModal()"
+          style="background:none;border:none;color:var(--txt2);font-size:22px;cursor:pointer">✕</button>
+      </div>
+      <div id="all-badges-content"
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ── LANGUAGE TOGGLE ── */
+    const htmlEl = document.documentElement;
+    document.querySelectorAll('.lang-opt').forEach(opt => {
+      opt.addEventListener('click', function () {
+        document.querySelectorAll('.lang-opt').forEach(o => o.classList.remove('active'));
+        this.classList.add('active');
+        htmlEl.setAttribute('data-lang', this.dataset.l);
+        localStorage.setItem('ekaidan_lang', this.dataset.l);
+      });
     });
-  }
-}
+    const savedLang = localStorage.getItem('ekaidan_lang');
+    if (savedLang) {
+      htmlEl.setAttribute('data-lang', savedLang);
+      document.querySelectorAll('.lang-opt').forEach(o => {
+        o.classList.toggle('active', o.dataset.l === savedLang);
+      });
+    }
 
-/* ── Streak pulse ── */
-setInterval(() => {
-  const el = document.getElementById('streaknum');
-  el.style.transform = 'scale(1.08)';
-  setTimeout(() => el.style.transform = 'scale(1)', 300);
-}, 4000);
-
-/* ── Daily challenge timer ── */
-let timerW = 82;
-setInterval(() => {
-  timerW = Math.max(timerW - 0.02, 0);
-  const tf = document.getElementById('tfill');
-  if (tf) tf.style.width = timerW.toFixed(1) + '%';
-}, 100);
-
-/* ── Scene player ── */
-function openScenePlayer(title, youtubeId) {
-  document.getElementById('scene-player-title').textContent = title;
-  document.getElementById('scene-player-iframe').src =
-    `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
-  document.getElementById('scene-player').classList.add('open');
-}
-function closeScenePlayer() {
-  document.getElementById('scene-player-iframe').src = '';
-  document.getElementById('scene-player').classList.remove('open');
-}
-
-/* ── Study modal (songs) ── */
-function openStudy(song) {
-  document.getElementById('study-title').textContent  = song.title;
-  document.getElementById('study-artist').textContent = song.artist || '';
-
-  // Video
-  const iframe = document.getElementById('study-iframe');
-  if (song.youtube_id) {
-    iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1`;
-    document.getElementById('study-video-wrap').style.display = '';
-  } else {
-    iframe.src = '';
-    document.getElementById('study-video-wrap').style.display = 'none';
-  }
-
-  // Lyrics
-  const lyricsEl = document.getElementById('study-lyrics');
-  const lyricsSection = document.getElementById('study-lyrics-section');
-  const lyrics = song.lyrics || [];
-  if (lyrics.length) {
-    lyricsEl.innerHTML = lyrics.map(l =>
-      `<span class="lyric-line">${l}</span>`
-    ).join('');
-    lyricsSection.style.display = '';
-  } else {
-    lyricsSection.style.display = 'none';
-  }
-
-  // Vocab
-  const vocabEl = document.getElementById('study-vocab');
-  const vocabSection = document.getElementById('study-vocab-section');
-  if (song.vocab && song.vocab.trim()) {
-    vocabEl.textContent = song.vocab;
-    vocabSection.style.display = '';
-  } else {
-    vocabSection.style.display = 'none';
-  }
-
-  // Quiz — build from first lyric line that has 4+ words
-  buildQuiz(lyrics);
-
-  // XP banner reset
-  const banner = document.getElementById('xp-earn-banner');
-  banner.classList.remove('show');
-  banner.textContent = '';
-
-  document.getElementById('study-modal').classList.add('open');
-}
-
-function buildQuiz(lyrics) {
-  const quizEl = document.getElementById('study-quiz');
-  // Find a lyric line with enough words
-  const line = lyrics.find(l => l.split(' ').length >= 4);
-  if (!line) { quizEl.style.display = 'none'; return; }
-
-  const words = line.split(' ');
-  // Pick a content word (not the first) as the answer
-  const answerIdx = words.slice(1).findIndex(w => w.length > 3) + 1;
-  if (answerIdx <= 0) { quizEl.style.display = 'none'; return; }
-
-  const answer = words[answerIdx].replace(/[^a-zA-Z']/g, '');
-  if (!answer) { quizEl.style.display = 'none'; return; }
-
-  // Build display line with blank
-  const display = words.map((w, i) => {
-    const clean = w.replace(/[^a-zA-Z']/g, '');
-    return i === answerIdx
-      ? `<span class="quiz-blank" id="quiz-blank">_____</span>`
-      : w;
-  }).join(' ');
-
-  document.getElementById('quiz-question').innerHTML = `"${display}"`;
-
-  // Generate wrong options (shuffled nearby letters)
-  const distractors = generateDistractors(answer);
-  const allOptions = shuffle([answer, ...distractors]);
-
-  const optionsEl = document.getElementById('quiz-options');
-  optionsEl.innerHTML = '';
-  allOptions.forEach(opt => {
-    const btn = document.createElement('div');
-    btn.className = 'quiz-opt';
-    btn.textContent = opt;
-    btn.onclick = () => handleQuizAnswer(btn, opt, answer, optionsEl);
-    optionsEl.appendChild(btn);
-  });
-
-  document.getElementById('quiz-hint').textContent = 'Choose your answer';
-  document.getElementById('quiz-hint').style.color = 'var(--txt3)';
-  quizEl.style.display = '';
-}
-
-function handleQuizAnswer(btn, chosen, correct, optionsEl) {
-  // Prevent double answering
-  if (optionsEl.querySelector('.correct') || optionsEl.querySelector('.wrong')) return;
-
-  const hint   = document.getElementById('quiz-hint');
-  const blank  = document.getElementById('quiz-blank');
-  const banner = document.getElementById('xp-earn-banner');
-
-  if (chosen === correct) {
-    btn.classList.add('correct');
-    if (blank) blank.textContent = correct;
-    hint.textContent  = '✓ 正解！ Correct!';
-    hint.style.color  = 'var(--green)';
-    banner.textContent = '🎉 +XP earned! Great work!';
-    banner.classList.add('show');
-  } else {
-    btn.classList.add('wrong');
-    hint.textContent = `✗ 不正解。 The answer was "${correct}"`;
-    hint.style.color = 'var(--red)';
-    // Highlight correct
-    optionsEl.querySelectorAll('.quiz-opt').forEach(o => {
-      if (o.textContent === correct) o.classList.add('correct');
+    /* ── Mode buttons ── */
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
     });
-  }
-}
 
-function generateDistractors(word) {
-  // Simple: common English words as fillers
-  const pool = ['the','and','you','love','know','feel','time','make','come','going','never','always','every','heart','night'];
-  return shuffle(pool.filter(w => w !== word.toLowerCase())).slice(0, 3);
-}
+    /* ── Daily challenge answer ── */
+    function answer(el, result) {
+      if (document.querySelector('.ch-opt.correct') || document.querySelector('.ch-opt.wrong')) return;
+      el.classList.add(result);
+      const hint = document.getElementById('hint');
+      const blank = document.getElementById('blank1');
+      const lang = htmlEl.getAttribute('data-lang');
+      if (result === 'correct') {
+        blank.textContent = 'shape';
+        hint.textContent = lang === 'jp'
+          ? '✓ 正解！ "shape" = 形 · +200 XP！'
+          : '✓ 正解！ "shape" = 形 · +200 XP!';
+        hint.style.color = 'var(--green)';
+        let cur = 62;
+        const iv = setInterval(() => {
+          cur = Math.min(cur + 2, 82);
+          document.getElementById('xpfill').style.width = cur + '%';
+          document.getElementById('xpnum').textContent = Math.round(cur * 10) + ' / 1000 XP';
+          if (cur >= 82) clearInterval(iv);
+        }, 30);
+      } else {
+        hint.textContent = lang === 'jp'
+          ? '✗ 不正解。正解は "shape" — 「形」'
+          : '✗ 不正解。 "shape" が正解 — "形"という意味。';
+        hint.style.color = 'var(--red)';
+        document.querySelectorAll('.ch-opt').forEach(o => {
+          if (o.textContent.trim() === 'shape') o.classList.add('correct');
+        });
+      }
+    }
 
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
+    /* ── Streak pulse ── */
+    setInterval(() => {
+      const el = document.getElementById('streaknum');
+      el.style.transform = 'scale(1.08)';
+      setTimeout(() => el.style.transform = 'scale(1)', 300);
+    }, 4000);
 
-function closeStudy() {
-  document.getElementById('study-iframe').src = '';
-  document.getElementById('study-modal').classList.remove('open');
-}
+    /* ── Daily challenge timer ── */
+    let timerW = 82;
+    setInterval(() => {
+      timerW = Math.max(timerW - 0.02, 0);
+      const tf = document.getElementById('tfill');
+      if (tf) tf.style.width = timerW.toFixed(1) + '%';
+    }, 100);
 
-// Close modals on backdrop click
-document.getElementById('study-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeStudy();
-});
-document.getElementById('scene-player').addEventListener('click', function(e) {
-  if (e.target === this) closeScenePlayer();
-});
-</script>
+    /* ── Scene player ── */
+    function openScenePlayer(title, youtubeId) {
+      document.getElementById('scene-player-title').textContent = title;
+      document.getElementById('scene-player-iframe').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+      document.getElementById('scene-player').classList.add('open');
+    }
+    function closeScenePlayer() {
+      document.getElementById('scene-player-iframe').src = '';
+      document.getElementById('scene-player').classList.remove('open');
+    }
 
-<script src="site.js"></script>
-<script src="main-integrated.js"></script>
+    /* ── Study modal ── */
+    function openStudy(song) {
+      document.getElementById('study-title').textContent = song.title;
+      document.getElementById('study-artist').textContent = song.artist || '';
+      const iframe = document.getElementById('study-iframe');
+      if (song.youtube_id) {
+        iframe.src = `https://www.youtube.com/embed/${song.youtube_id}?autoplay=1`;
+        document.getElementById('study-video-wrap').style.display = '';
+      } else {
+        iframe.src = '';
+        document.getElementById('study-video-wrap').style.display = 'none';
+      }
+      const lyrics = song.lyrics || [];
+      const lyricsSection = document.getElementById('study-lyrics-section');
+      if (lyrics.length) {
+        document.getElementById('study-lyrics').innerHTML = lyrics.map(l => `<span class="lyric-line">${l}</span>`).join('');
+        lyricsSection.style.display = '';
+      } else { lyricsSection.style.display = 'none'; }
+      const vocabSection = document.getElementById('study-vocab-section');
+      if (song.vocab && song.vocab.trim()) {
+        document.getElementById('study-vocab').textContent = song.vocab;
+        vocabSection.style.display = '';
+      } else { vocabSection.style.display = 'none'; }
+      buildQuiz(lyrics);
+      document.getElementById('xp-earn-banner').classList.remove('show');
+      document.getElementById('study-modal').classList.add('open');
+    }
+
+    function buildQuiz(lyrics) {
+      const quizEl = document.getElementById('study-quiz');
+      const line = lyrics.find(l => l.split(' ').length >= 4);
+      if (!line) { quizEl.style.display = 'none'; return; }
+      const words = line.split(' ');
+      const answerIdx = words.slice(1).findIndex(w => w.length > 3) + 1;
+      if (answerIdx <= 0) { quizEl.style.display = 'none'; return; }
+      const ans = words[answerIdx].replace(/[^a-zA-Z']/g, '');
+      if (!ans) { quizEl.style.display = 'none'; return; }
+      document.getElementById('quiz-question').innerHTML = '"' + words.map((w, i) =>
+        i === answerIdx ? `<span class="quiz-blank" id="quiz-blank">_____</span>` : w
+      ).join(' ') + '"';
+      const opts = shuffle([ans, ...generateDistractors(ans)]);
+      const optionsEl = document.getElementById('quiz-options');
+      optionsEl.innerHTML = '';
+      opts.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.className = 'quiz-opt';
+        btn.textContent = opt;
+        btn.onclick = () => handleQuizAnswer(btn, opt, ans, optionsEl);
+        optionsEl.appendChild(btn);
+      });
+      quizEl.style.display = '';
+    }
+
+    function handleQuizAnswer(btn, chosen, correct, optionsEl) {
+      if (optionsEl.querySelector('.correct') || optionsEl.querySelector('.wrong')) return;
+      const lang = htmlEl.getAttribute('data-lang');
+      const hint = document.getElementById('quiz-hint');
+      const blank = document.getElementById('quiz-blank');
+      const banner = document.getElementById('xp-earn-banner');
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        if (blank) blank.textContent = correct;
+        hint.textContent = lang === 'jp' ? '✓ 正解！' : '✓ 正解！ Correct!';
+        hint.style.color = 'var(--green)';
+        banner.textContent = '🎉 +XP earned! Great work!';
+        banner.classList.add('show');
+      } else {
+        btn.classList.add('wrong');
+        hint.textContent = lang === 'jp' ? `✗ 不正解。正解は "${correct}"` : `✗ 不正解。 The answer was "${correct}"`;
+        hint.style.color = 'var(--red)';
+        optionsEl.querySelectorAll('.quiz-opt').forEach(o => { if (o.textContent === correct) o.classList.add('correct'); });
+      }
+    }
+
+    function generateDistractors(word) {
+      const pool = ['the', 'and', 'you', 'love', 'know', 'feel', 'time', 'make', 'come', 'going', 'never', 'always', 'every', 'heart', 'night'];
+      return shuffle(pool.filter(w => w !== word.toLowerCase())).slice(0, 3);
+    }
+    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+    function closeStudy() {
+      document.getElementById('study-iframe').src = '';
+      document.getElementById('study-modal').classList.remove('open');
+    }
+
+    /* ── Songs modal ── */
+    function openSongsModal() {
+      document.getElementById('songs-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSongsModal() {
+      document.getElementById('songs-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    /* ── Leaderboard modal ── */
+    async function openLeaderboardModal() {
+      const modal = document.getElementById('leaderboard-modal');
+      const content = document.getElementById('full-leaderboard-content');
+      content.innerHTML = 'Loading…';
+      modal.style.display = 'flex';
+      try {
+        const players = await DB.getLeaderboard(50);
+        content.innerHTML = '';
+        const currentUser = AUTH.currentProfile();
+        players.forEach((p, i) => {
+          const isMe = currentUser && p.username === currentUser.username;
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px;border-bottom:0.5px solid var(--border);' + (isMe ? 'background:rgba(245,197,24,0.1)' : '');
+          row.innerHTML = `<div style="width:30px;text-align:center;font-weight:700;color:${i < 3 ? 'var(--yellow)' : i < 10 ? 'var(--blue)' : 'var(--txt2)'}">${i + 1}</div><div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--txt3)">${p.username.slice(0, 2).toUpperCase()}</div><div style="flex:1"><div style="font-weight:700">${p.username}${isMe ? ' <span style="color:var(--yellow)">★ you</span>' : ''}</div><div style="font-size:12px;color:var(--txt2)">Lv ${p.level || 1}</div></div><div style="text-align:right"><div style="font-weight:700">${(p.xp || 0).toLocaleString()} XP</div><div style="font-size:12px;color:var(--txt2)">🔥 ${p.streak || 0}</div></div>`;
+          content.appendChild(row);
+        });
+      } catch (e) { content.innerHTML = 'Error loading leaderboard.'; }
+    }
+    function closeLeaderboardModal() { document.getElementById('leaderboard-modal').style.display = 'none'; }
+
+    /* ── Badges modal ── */
+    function openBadgesModal() {
+      const modal = document.getElementById('badges-modal');
+      const content = document.getElementById('all-badges-content');
+      const lang = htmlEl.getAttribute('data-lang');
+      content.innerHTML = '';
+      const allBadges = [
+        { icon: '🎬', en: 'Movie Fan', jp: '映画ファン', desc: 'Watch 10 movie scenes' },
+        { icon: '🎵', en: 'Lyricist', jp: '作詞家', desc: 'Complete 20 songs' },
+        { icon: '🔥', en: '14-Day Streak', jp: '14日連続', desc: 'Maintain a 14-day streak' },
+        { icon: '⚡', en: 'Speed Demon', jp: 'スピード悪魔', desc: 'Complete 50 speed rounds' },
+        { icon: '👑', en: 'League King', jp: 'リーグ王', desc: 'Reach Master League' },
+        { icon: '🎤', en: 'Karaoke Pro', jp: 'カラオケ名人', desc: 'Sing 100 songs' },
+        { icon: '🌟', en: '100 Scenes', jp: '100シーン', desc: 'Watch 100 scenes' },
+        { icon: '🆚', en: 'Undefeated', jp: '無敵', desc: 'Win 20 battles' },
+        { icon: '📚', en: 'Vocab Master', jp: '語彙マスター', desc: 'Learn 500 words' },
+        { icon: '🎯', en: 'Perfect Score', jp: '満点', desc: 'Get 100% on a quiz' },
+        { icon: '🌍', en: 'Global Citizen', jp: '国際人', desc: 'Complete 10 country challenges' },
+        { icon: '⏰', en: 'Early Bird', jp: '早起き鳥', desc: 'Complete daily challenge before 8 AM' },
+        { icon: '🏃', en: 'Marathon Runner', jp: 'マラソン選手', desc: 'Play 7 days straight' },
+        { icon: '🤝', en: 'Team Player', jp: 'チームプレイヤー', desc: 'Invite 5 friends' },
+        { icon: '💎', en: 'Diamond', jp: 'ダイヤモンド', desc: 'Earn 10,000 XP' },
+        { icon: '🚀', en: 'Rocket', jp: 'ロケット', desc: 'Level up 10 times' },
+        { icon: '🦄', en: 'Unicorn', jp: 'ユニコーン', desc: 'Rare achievement' },
+        { icon: '🏆', en: 'Champion', jp: 'チャンピオン', desc: 'Win weekly leaderboard' },
+        { icon: '🎨', en: 'Artist', jp: 'アーティスト', desc: 'Create custom content' },
+        { icon: '🔮', en: 'Fortune Teller', jp: '占い師', desc: 'Predict 10 quiz answers correctly' },
+      ];
+      allBadges.forEach(badge => {
+        const item = document.createElement('div');
+        item.style.cssText = 'background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:transform 0.15s';
+        item.innerHTML = `<div style="font-size:24px;margin-bottom:6px">${badge.icon}</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">${lang === 'jp' ? badge.jp : badge.en}</div><div style="font-size:10px;color:var(--txt2)">${badge.desc}</div>`;
+        item.onmouseover = () => item.style.transform = 'scale(1.05)';
+        item.onmouseout = () => item.style.transform = 'scale(1)';
+        item.onclick = () => alert(`${lang === 'jp' ? badge.jp : badge.en}: ${badge.desc}`);
+        content.appendChild(item);
+      });
+      modal.style.display = 'flex';
+    }
+    function closeBadgesModal() { document.getElementById('badges-modal').style.display = 'none'; }
+
+    /* ── Backdrop close ── */
+    document.getElementById('study-modal').addEventListener('click', function (e) { if (e.target === this) closeStudy(); });
+    document.getElementById('scene-player').addEventListener('click', function (e) { if (e.target === this) closeScenePlayer(); });
+    document.getElementById('leaderboard-modal').addEventListener('click', function (e) { if (e.target === this) closeLeaderboardModal(); });
+    document.getElementById('badges-modal').addEventListener('click', function (e) { if (e.target === this) closeBadgesModal(); });
+    document.getElementById('songs-modal').addEventListener('click', function (e) { if (e.target === this) closeSongsModal(); });
+
+    /* ── Daily quest cards ── */
+    document.querySelectorAll('.daily-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const title = card.querySelector('.dc-title')?.textContent?.trim() || '';
+        alert(title + '\n\nKeep playing to complete quests!');
+      });
+    });
+  </script>
+
+  <script src="site_js_final.js"></script>
+  <script src="main_integrated_final.js"></script>
 
 </body>
+
 </html>
